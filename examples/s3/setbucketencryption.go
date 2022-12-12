@@ -26,7 +26,6 @@ import (
 
 	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/credentials"
 	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/sse"
-	"github.com/minio/minio-go/v7"
 )
 
 func main() {

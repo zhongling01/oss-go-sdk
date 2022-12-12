@@ -24,9 +24,8 @@ import (
 	"context"
 	"log"
 
-	"github.com/cheggaaa/pb"
-	"github.com/minio/minio-go/v7"
 	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/credentials"
+	"github.com/cheggaaa/pb"
 )
 
 func main() {

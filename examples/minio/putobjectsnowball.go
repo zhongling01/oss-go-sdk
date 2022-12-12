@@ -29,7 +29,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/minio/minio-go/v7"
 	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/credentials"
 )
 

@@ -27,7 +27,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/minio/minio-go/v7"
 	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/credentials"
 )
 

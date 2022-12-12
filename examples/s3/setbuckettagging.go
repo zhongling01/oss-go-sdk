@@ -24,7 +24,7 @@ import (
 	"context"
 	"log"
 
-	minio "github.com/minio/minio-go/v7"
+	minio "github.com/ZeroLuKa/trinet-oss-go-sdk/pkg"
 	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/credentials"
 	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/tags"
 )

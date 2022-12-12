@@ -26,8 +26,8 @@ import (
 	"log"
 	"os"
 
+	minio "github.com/ZeroLuKa/trinet-oss-go-sdk/pkg"
 	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/credentials"
-	minio "github.com/minio/minio-go/v7"
 )
 
 func main() {

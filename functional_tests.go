@@ -55,7 +55,6 @@ import (
 	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/encrypt"
 	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/notification"
 	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/tags"
-	"github.com/minio/minio-go/v7"
 )
 
 const letterBytes = "abcdefghijklmnopqrstuvwxyz01234569"
