@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package minio
+package ossClient
 
 // awsS3EndpointMap Amazon S3 endpoint map.
 var awsS3EndpointMap = map[string]string{

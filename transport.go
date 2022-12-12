@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
-package minio
+package ossClient
 
 import (
 	"crypto/tls"

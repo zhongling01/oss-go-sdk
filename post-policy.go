@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package minio
+package ossClient
 
 import (
 	"encoding/base64"
