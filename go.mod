@@ -1,4 +1,4 @@
-module github.com/ZeroLuKa/ossClient
+module github.com/ZeroLuKa/trinet-oss-go-sdk
 
 go 1.18
 
