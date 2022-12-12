@@ -24,8 +24,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/minio/minio-go/v7/pkg/s3utils"
-	"github.com/minio/minio-go/v7/pkg/tags"
+	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/s3utils"
+	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/tags"
 )
 
 // RestoreType represents the restore request type

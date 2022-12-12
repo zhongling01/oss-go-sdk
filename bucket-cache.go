@@ -25,9 +25,9 @@ import (
 	"path"
 	"sync"
 
-	"github.com/minio/minio-go/v7/pkg/credentials"
-	"github.com/minio/minio-go/v7/pkg/s3utils"
-	"github.com/minio/minio-go/v7/pkg/signer"
+	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/credentials"
+	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/s3utils"
+	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/signer"
 )
 
 // bucketLocationCache - Provides simple mechanism to hold bucket

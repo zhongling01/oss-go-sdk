@@ -32,9 +32,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/encrypt"
+	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/s3utils"
 	"github.com/google/uuid"
-	"github.com/minio/minio-go/v7/pkg/encrypt"
-	"github.com/minio/minio-go/v7/pkg/s3utils"
 )
 
 func (c *Client) putObjectMultipart(ctx context.Context, bucketName, objectName string, reader io.Reader, size int64,

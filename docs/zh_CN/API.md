@@ -1503,7 +1503,7 @@ fmt.Printf("%s\n", url)
 ### SetBucketPolicy(bucketname, objectPrefix string, policy policy.BucketPolicy) error
 给存储桶或者对象前缀设置访问权限。
 
-必须引入`github.com/minio/minio-go/v7/pkg/policy`包。
+必须引入`github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/policy`包。
 
 __参数__
 
@@ -1544,7 +1544,7 @@ if err != nil {
 ### GetBucketPolicy(bucketName, objectPrefix string) (policy.BucketPolicy, error)
 获取存储桶或者对象前缀的访问权限。
 
-必须引入`github.com/minio/minio-go/v7/pkg/policy`包。
+必须引入`github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/policy`包。
 
 __参数__
 

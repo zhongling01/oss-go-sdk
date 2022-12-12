@@ -21,7 +21,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/minio/minio-go/v7/pkg/set"
+	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/set"
 )
 
 // ConditionKeyMap.Add() is called and the result is validated.

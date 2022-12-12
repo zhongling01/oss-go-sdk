@@ -51,11 +51,11 @@ import (
 	"github.com/minio/sha256-simd"
 	log "github.com/sirupsen/logrus"
 
+	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/credentials"
+	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/encrypt"
+	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/notification"
+	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/tags"
 	"github.com/minio/minio-go/v7"
-	"github.com/minio/minio-go/v7/pkg/credentials"
-	"github.com/minio/minio-go/v7/pkg/encrypt"
-	"github.com/minio/minio-go/v7/pkg/notification"
-	"github.com/minio/minio-go/v7/pkg/tags"
 )
 
 const letterBytes = "abcdefghijklmnopqrstuvwxyz01234569"

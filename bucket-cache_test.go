@@ -28,8 +28,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/minio/minio-go/v7/pkg/credentials"
-	"github.com/minio/minio-go/v7/pkg/signer"
+	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/credentials"
+	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/signer"
 )
 
 // Test validates `newBucketLocationCache`.
