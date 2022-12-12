@@ -8,7 +8,6 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/klauspost/compress v1.15.13
 	github.com/minio/md5-simd v1.1.2
-	github.com/minio/minio-go/v7 v7.0.45
 	github.com/minio/sha256-simd v1.0.0
 	github.com/rs/xid v1.4.0
 	github.com/sirupsen/logrus v1.9.0
