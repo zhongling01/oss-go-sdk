@@ -36,9 +36,22 @@ import (
 //	for message := range api.ListBuckets(context.Background()) {
 //	    fmt.Println(message)
 //	}
-func (c *Client) ListBuckets(ctx context.Context) ([]BucketInfo, error) {
+func (c *Client) ListBuckets(ctx context.Context, listRecycle bool) ([]BucketInfo, error) {
 	// Execute GET on service.
-	resp, err := c.executeMethod(ctx, http.MethodGet, requestMetadata{contentSHA256Hex: emptySHA256Hex})
+	/* trinet*/
+	var customHeader http.Header
+	if listRecycle {
+		headers := make(http.Header)
+		headers.Add("X-Minio-List-Recycle-Bucket", "true")
+		customHeader = headers
+	}
+
+	resp, err := c.executeMethod(ctx, http.MethodGet, requestMetadata{
+		contentSHA256Hex: emptySHA256Hex,
+		customHeader:     customHeader,
+	})
+	/* trinet*/
+
 	defer closeResponse(resp)
 	if err != nil {
 		return nil, err

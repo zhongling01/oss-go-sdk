@@ -80,6 +80,39 @@ func (c *Client) RemoveBucketWithOptions(ctx context.Context, bucketName string,
 	return nil
 }
 
+//* trinet*/
+
+// RecycleBucket recycle the bucket
+func (c *Client) RecycleBucket(ctx context.Context, bucketName string) error {
+	// Input validation.
+	if err := s3utils.CheckValidBucketName(bucketName); err != nil {
+		return err
+	}
+
+	urlValues := make(url.Values)
+	urlValues.Set("recyclebucket", "")
+
+	// Execute PUT on bucket.
+	resp, err := c.executeMethod(ctx, http.MethodPut, requestMetadata{
+		bucketName:       bucketName,
+		contentSHA256Hex: emptySHA256Hex,
+		queryValues:      urlValues,
+	})
+	defer closeResponse(resp)
+	if err != nil {
+		return err
+	}
+	if resp != nil {
+		if resp.StatusCode != http.StatusOK {
+			return httpRespToErrorResponse(resp, bucketName, "")
+		}
+	}
+
+	return nil
+}
+
+//* trinet*/
+
 // RemoveBucket deletes the bucket name.
 //
 //	All objects (including all object versions and delete markers).

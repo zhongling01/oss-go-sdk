@@ -33,16 +33,16 @@ func (c *Client) makeBucket(ctx context.Context, bucketName string, opts MakeBuc
 		return err
 	}
 
-	err = c.doMakeBucket(ctx, bucketName, opts.Region, opts.ObjectLocking)
+	err = c.doMakeBucket(ctx, bucketName, opts.Region, opts)
 	if err != nil && (opts.Region == "" || opts.Region == "us-east-1") {
 		if resp, ok := err.(ErrorResponse); ok && resp.Code == "AuthorizationHeaderMalformed" && resp.Region != "" {
-			err = c.doMakeBucket(ctx, bucketName, resp.Region, opts.ObjectLocking)
+			err = c.doMakeBucket(ctx, bucketName, resp.Region, opts)
 		}
 	}
 	return err
 }
 
-func (c *Client) doMakeBucket(ctx context.Context, bucketName string, location string, objectLockEnabled bool) (err error) {
+func (c *Client) doMakeBucket(ctx context.Context, bucketName string, location string, opts MakeBucketOptions) (err error) {
 	defer func() {
 		// Save the location into cache on a successful makeBucket response.
 		if err == nil {
@@ -65,11 +65,18 @@ func (c *Client) doMakeBucket(ctx context.Context, bucketName string, location s
 		bucketLocation: location,
 	}
 
-	if objectLockEnabled {
+	/* trinet*/
+	if opts.ObjectLocking || opts.RecycleEnabled {
 		headers := make(http.Header)
-		headers.Add("x-amz-bucket-object-lock-enabled", "true")
+		if opts.ObjectLocking {
+			headers.Add("x-amz-bucket-object-lock-enabled", "true")
+		}
+		if opts.RecycleEnabled {
+			headers.Add("X-Minio-Bucket-Recycle-Enabled", "true")
+		}
 		reqMetadata.customHeader = headers
 	}
+	/* trinet*/
 
 	// If location is not 'us-east-1' create bucket location config.
 	if location != "us-east-1" && location != "" {
@@ -109,6 +116,8 @@ type MakeBucketOptions struct {
 	Region string
 	// Enable object locking
 	ObjectLocking bool
+	/* trinet :recycle bucket */
+	RecycleEnabled bool
 }
 
 // MakeBucket creates a new bucket with bucketName with a context to control cancellations and timeouts.
