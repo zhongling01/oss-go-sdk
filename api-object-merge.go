@@ -102,6 +102,8 @@ func (p *PutObjectMerge) UploadMergePart(objectName string, reader io.Reader) (*
 	p.reader.data = append(p.reader.data, data)
 	if _, ok := p.meta.Info[objectName]; ok {
 		p.meta.VacancySize += p.meta.Info[objectName].Size
+	} else {
+		p.meta.ObjectNum++
 	}
 	p.meta.Info[objectName] = &ObjectIndex{
 		Valid:  true,
