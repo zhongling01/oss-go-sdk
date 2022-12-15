@@ -10,8 +10,9 @@ import (
 )
 
 const (
-	idxPrefix  = "mergeObject.idx."
-	dataPrefix = "mergeObject.data."
+	MergeDir   = ".internal.merge.objects/"
+	IdxPrefix  = ".idx."
+	DataPrefix = ".data."
 )
 
 type ObjectIndex struct {
@@ -66,7 +67,7 @@ func (c *Client) InitMergePartUpload(id, bucketName string) (*PutObjectMerge, er
 	}
 
 	if id == "" {
-		uuid, err := uuid2.NewUUID()
+		uuid, err := uuid2.NewRandom()
 		if err != nil {
 			return nil, err
 		}
@@ -121,14 +122,14 @@ func (p *PutObjectMerge) CompleteMergePartUpload(ctx context.Context) error {
 		return err
 	}
 
-	_, err = p.client.PutObject(ctx, p.bucketName, idxPrefix+p.ID, bytes.NewReader(objectIndexInfo), int64(len(objectIndexInfo)), PutObjectOptions{})
+	_, err = p.client.PutObject(ctx, p.bucketName, MergeDir+IdxPrefix+p.ID, bytes.NewReader(objectIndexInfo), int64(len(objectIndexInfo)), PutObjectOptions{})
 	if err != nil {
 		return err
 	}
 
-	_, err = p.client.PutObject(ctx, p.bucketName, dataPrefix+p.ID, p.reader, p.meta.TotalSize, PutObjectOptions{})
+	_, err = p.client.PutObject(ctx, p.bucketName, MergeDir+DataPrefix+p.ID, p.reader, p.meta.TotalSize, PutObjectOptions{})
 	if err != nil {
-		p.client.removeObject(ctx, p.bucketName, idxPrefix+p.ID, RemoveObjectOptions{GovernanceBypass: true})
+		p.client.removeObject(ctx, p.bucketName, MergeDir+IdxPrefix+p.ID, RemoveObjectOptions{GovernanceBypass: true})
 		return err
 	}
 
@@ -154,7 +155,7 @@ func (c *Client) GetObjectIndexInfo(ctx context.Context, id, bucketName string) 
 		Info: make(map[string]*ObjectIndex, 0),
 	}
 
-	metaData, err := c.GetObject(ctx, bucketName, idxPrefix+id, GetObjectOptions{})
+	metaData, err := c.GetObject(ctx, bucketName, MergeDir+IdxPrefix+id, GetObjectOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -185,7 +186,7 @@ func (c *Client) GetObjectWithIndex(ctx context.Context, id, bucketName, objectN
 		return nil, err
 	}
 
-	data, err := c.GetObject(ctx, bucketName, dataPrefix+id, opts)
+	data, err := c.GetObject(ctx, bucketName, MergeDir+DataPrefix+id, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -194,12 +195,12 @@ func (c *Client) GetObjectWithIndex(ctx context.Context, id, bucketName, objectN
 }
 
 func (c *Client) DeleteMergeID(ctx context.Context, id, bucketName string) error {
-	err := c.RemoveObject(ctx, bucketName, dataPrefix+id, RemoveObjectOptions{})
+	err := c.RemoveObject(ctx, bucketName, MergeDir+DataPrefix+id, RemoveObjectOptions{})
 	if err != nil {
 		return err
 	}
 
-	return c.RemoveObject(ctx, bucketName, idxPrefix+id, RemoveObjectOptions{})
+	return c.RemoveObject(ctx, bucketName, MergeDir+IdxPrefix+id, RemoveObjectOptions{})
 }
 
 func (c *Client) DeleteObjectWithId(ctx context.Context, id, bucketName, objectName string) error {
@@ -222,7 +223,7 @@ func (c *Client) DeleteObjectWithId(ctx context.Context, id, bucketName, objectN
 		return err
 	}
 
-	_, err = c.PutObject(ctx, bucketName, idxPrefix+id, bytes.NewReader(objectIndexInfo), int64(len(objectIndexInfo)), PutObjectOptions{})
+	_, err = c.PutObject(ctx, bucketName, MergeDir+IdxPrefix+id, bytes.NewReader(objectIndexInfo), int64(len(objectIndexInfo)), PutObjectOptions{})
 	if err != nil {
 		return err
 	}
