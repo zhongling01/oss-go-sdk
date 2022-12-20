@@ -57,13 +57,25 @@ func (r *PutObjectMergeReader) Read(buf []byte) (int, error) {
 	return n, nil
 }
 
+func checkBucket(c *Client, bucketName string) error {
+	info, err := c.GetBucketVersioning(context.Background(), bucketName)
+	if err != nil {
+		return err
+	}
+	if info.Enabled() {
+		return errors.New("Merge operations are not supported for buckets with versioning turned on")
+	}
+	//if info.Suspended() {
+	//	return errors.New("Bucket is suspended")
+	//}
+
+	return nil
+}
+
 func (c *Client) InitMergePartUpload(id, bucketName string) (*PutObjectMerge, error) {
-	exist, err := c.BucketExists(context.Background(), bucketName)
+	err := checkBucket(c, bucketName)
 	if err != nil {
 		return nil, err
-	}
-	if !exist {
-		return nil, errors.New("bucket not exist")
 	}
 
 	if id == "" {
@@ -117,6 +129,11 @@ func (p *PutObjectMerge) UploadMergePart(objectName string, reader io.Reader) (*
 }
 
 func (p *PutObjectMerge) CompleteMergePartUpload(ctx context.Context) error {
+	err := checkBucket(p.client, p.bucketName)
+	if err != nil {
+		return err
+	}
+
 	objectIndexInfo, err := json.Marshal(p.meta)
 	if err != nil {
 		return err
@@ -195,7 +212,12 @@ func (c *Client) GetObjectWithIndex(ctx context.Context, id, bucketName, objectN
 }
 
 func (c *Client) DeleteMergeID(ctx context.Context, id, bucketName string) error {
-	err := c.RemoveObject(ctx, bucketName, MergeDir+DataPrefix+id, RemoveObjectOptions{})
+	err := checkBucket(c, bucketName)
+	if err != nil {
+		return err
+	}
+
+	err = c.RemoveObject(ctx, bucketName, MergeDir+DataPrefix+id, RemoveObjectOptions{})
 	if err != nil {
 		return err
 	}
@@ -204,6 +226,11 @@ func (c *Client) DeleteMergeID(ctx context.Context, id, bucketName string) error
 }
 
 func (c *Client) DeleteObjectWithId(ctx context.Context, id, bucketName, objectName string) error {
+	err := checkBucket(c, bucketName)
+	if err != nil {
+		return err
+	}
+
 	meta, err := c.GetObjectIndexInfo(ctx, id, bucketName)
 	if err != nil {
 		return err
