@@ -88,11 +88,14 @@ type PutObjectOptions struct {
 	DisableContentSha256    bool
 	DisableMultipart        bool
 	/* trinet*/
-	UpdateMode   string
-	UpdateOffset string
+	UpdateInfo         UpdateInfo
 	AmzSnowballExtract bool
 	/* trinet*/
 	Internal AdvancedPutOptions
+}
+type UpdateInfo struct {
+	UpdateMode   string
+	UpdateOffset string
 }
 
 // getNumThreads - gets the number of threads to be used in the multipart
@@ -176,11 +179,10 @@ func (opts PutObjectOptions) Header() (header http.Header) {
 		header.Set(minIOBucketReplicationTaggingTimestamp, opts.Internal.TaggingTimestamp.Format(time.RFC3339Nano))
 	}
 	/* trinet*/
-	if opts.UpdateMode != "" {
-		header.Set(MinIOPartialUpdateMode, opts.UpdateMode)
+	if opts.UpdateInfo.UpdateMode != "" && opts.UpdateInfo.UpdateOffset != "" {
+		header.Set(MinIOPartialUpdateMode, opts.UpdateInfo.UpdateMode)
+		header.Set(MinIOPartialUpdateOffset, opts.UpdateInfo.UpdateOffset)
 	}
-	if opts.UpdateOffset != "" {
-		header.Set(MinIOPartialUpdateOffset, opts.UpdateOffset)
 	if opts.AmzSnowballExtract {
 		header.Set(AmzSnowballExtract, "true")
 	}
