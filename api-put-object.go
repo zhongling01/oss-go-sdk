@@ -90,6 +90,7 @@ type PutObjectOptions struct {
 	/* trinet*/
 	UpdateMode   string
 	UpdateOffset string
+	AmzSnowballExtract bool
 	/* trinet*/
 	Internal AdvancedPutOptions
 }
@@ -180,6 +181,8 @@ func (opts PutObjectOptions) Header() (header http.Header) {
 	}
 	if opts.UpdateOffset != "" {
 		header.Set(MinIOPartialUpdateOffset, opts.UpdateOffset)
+	if opts.AmzSnowballExtract {
+		header.Set(AmzSnowballExtract, "true")
 	}
 	/* trinet*/
 
