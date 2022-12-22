@@ -254,6 +254,10 @@ func (c *Client) PutObject(ctx context.Context, bucketName, objectName string, r
 		return UploadInfo{}, errors.New("object size must be provided with disable multipart upload")
 	}
 
+	if objectSize >= minPartSize && (opts.UpdateInfo.UpdateOffset != "" || opts.UpdateInfo.UpdateMode != "") {
+		return UploadInfo{}, errors.New("Update part size must be smaller than minPartSize(16MB)")
+	}
+
 	err = opts.validate()
 	if err != nil {
 		return UploadInfo{}, err
