@@ -112,6 +112,10 @@ func (p *PutObjectMerge) UploadMergePart(objectName string, reader io.Reader) (*
 		return nil, errors.New("no data given")
 	}
 
+	if p.meta.TotalSize + dataSize > maxSinglePutObjectSize{
+		return nil, errors.New("the merged file is too large, please execute CompleteMergePartUpload first")
+	}
+
 	p.reader.data = append(p.reader.data, data)
 	if _, ok := p.meta.Info[objectName]; ok {
 		p.meta.VacancySize += p.meta.Info[objectName].Size
