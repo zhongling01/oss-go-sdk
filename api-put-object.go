@@ -27,6 +27,7 @@ import (
 	"io"
 	"net/http"
 	"sort"
+	"strconv"
 	"time"
 
 	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/encrypt"
@@ -228,6 +229,52 @@ type completedParts []CompletePart
 func (a completedParts) Len() int           { return len(a) }
 func (a completedParts) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a completedParts) Less(i, j int) bool { return a[i].PartNumber < a[j].PartNumber }
+
+func (c *Client) ExtractOnline(ctx context.Context, bucketName string, reader io.Reader, objectSize int64,
+) (info UploadInfo, err error) {
+	if objectSize >= maxPartSize {
+		return UploadInfo{}, errors.New("ExtractOnline file is too large")
+	}
+	if objectSize < 0 {
+		return UploadInfo{}, errors.New("ExtractOnline file is too small, extract can't use steaming upload")
+	}
+
+	opts := PutObjectOptions{
+		AmzSnowballExtract: true,
+		PartSize:           maxPartSize,
+		DisableMultipart:   true,
+	}
+	objectName := "extractfile"
+	return c.PutObject(ctx, bucketName, objectName, reader, objectSize, opts)
+}
+
+func (c *Client) UpdateObject(updateOffset int, updateMod, bucketName, objectName string, reader io.Reader, objectSize int64) (UploadInfo, error) {
+	if updateMod != "Insert" && updateMod != "Replace" {
+		return UploadInfo{}, errors.New("unsupported mode")
+	}
+	if updateOffset < -1 {
+		return UploadInfo{}, errors.New("offset must be greater than -1")
+	}+
+	if objectSize >= maxPartSize {
+		return UploadInfo{}, errors.New("Update file is too large")
+	}
+	if objectSize < 0 {
+		return UploadInfo{}, errors.New("Update file is too small, Update can't use steaming upload")
+	}
+
+	updateInfo := UpdateInfo{
+		UpdateMode:   updateMod,
+		UpdateOffset: strconv.Itoa(updateOffset),
+	}
+	opts := PutObjectOptions{
+		UpdateInfo:       updateInfo,
+		DisableMultipart: true,
+		PartSize:         maxPartSize,
+	}
+
+	return c.PutObject(context.Background(), bucketName, objectName, reader, objectSize, opts)
+
+}
 
 // PutObject creates an object in a bucket.
 //
