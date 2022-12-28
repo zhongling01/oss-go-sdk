@@ -254,7 +254,7 @@ func (c *Client) UpdateObject(updateOffset int, updateMod, bucketName, objectNam
 	}
 	if updateOffset < -1 {
 		return UploadInfo{}, errors.New("offset must be greater than -1")
-	}+
+	}
 	if objectSize >= maxPartSize {
 		return UploadInfo{}, errors.New("Update file is too large")
 	}
@@ -299,10 +299,6 @@ func (c *Client) PutObject(ctx context.Context, bucketName, objectName string, r
 ) (info UploadInfo, err error) {
 	if objectSize < 0 && opts.DisableMultipart {
 		return UploadInfo{}, errors.New("object size must be provided with disable multipart upload")
-	}
-
-	if objectSize >= minPartSize && (opts.UpdateInfo.UpdateOffset != "" || opts.UpdateInfo.UpdateMode != "") {
-		return UploadInfo{}, errors.New("Update part size must be smaller than minPartSize(16MB)")
 	}
 
 	err = opts.validate()
