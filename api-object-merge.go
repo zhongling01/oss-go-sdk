@@ -5,6 +5,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"time"
+	"fmt"
 	uuid2 "github.com/google/uuid"
 	"io"
 )
@@ -83,7 +85,7 @@ func (c *Client) InitMergePartUpload(id, bucketName string) (*PutObjectMerge, er
 		if err != nil {
 			return nil, err
 		}
-		id = uuid.String()
+		id = fmt.Sprintf("%s-%d",uuid.String(), time.Now().UnixNano())
 	}
 
 	return &PutObjectMerge{
