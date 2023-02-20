@@ -5,10 +5,11 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"time"
 	"fmt"
+	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/tags"
 	uuid2 "github.com/google/uuid"
 	"io"
+	"time"
 )
 
 const (
@@ -85,7 +86,7 @@ func (c *Client) InitMergePartUpload(id, bucketName string) (*PutObjectMerge, er
 		if err != nil {
 			return nil, err
 		}
-		id = fmt.Sprintf("%s-%d",uuid.String(), time.Now().UnixNano())
+		id = fmt.Sprintf("%s-%d", uuid.String(), time.Now().UnixNano())
 	}
 
 	return &PutObjectMerge{
@@ -114,7 +115,7 @@ func (p *PutObjectMerge) UploadMergePart(objectName string, reader io.Reader) (*
 		return nil, errors.New("no data given")
 	}
 
-	if p.meta.TotalSize + dataSize > maxSinglePutObjectSize{
+	if p.meta.TotalSize+dataSize > maxSinglePutObjectSize {
 		return nil, errors.New("the merged file is too large, please execute CompleteMergePartUpload first")
 	}
 
@@ -262,4 +263,22 @@ func (c *Client) DeleteObjectWithId(ctx context.Context, id, bucketName, objectN
 	}
 
 	return nil
+}
+
+func (c *Client) PutMergeObjectTagging(ctx context.Context, bucketName, id string, otags *tags.Tags, opts PutObjectTaggingOptions) error {
+	err := c.PutObjectTagging(ctx, bucketName, MergeDir+IdxPrefix+id, otags, opts)
+	if err != nil {
+		return err
+	}
+
+	err = c.PutObjectTagging(ctx, bucketName, MergeDir+DataPrefix+id, otags, opts)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) GetMergeObjectTagging(ctx context.Context, bucketName, id string, opts GetObjectTaggingOptions) (*tags.Tags, error) {
+	return c.GetObjectTagging(ctx, bucketName, MergeDir+IdxPrefix+id, opts)
 }
