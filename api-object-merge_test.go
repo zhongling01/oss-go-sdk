@@ -129,6 +129,19 @@ func TestClient_BaseMergePartUpload(t *testing.T) {
 		}
 	}
 
+	err = client.RemoveMergeObjectTagging(context.Background(), bucket, id, RemoveObjectTaggingOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ret, err = client.GetMergeObjectTagging(context.Background(), bucket, id, GetObjectTaggingOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(ret.ToMap()) != 0 {
+		t.Fatal("remove tag failed")
+	}
+
 }
 
 func TestClient_Vacancy(t *testing.T) {

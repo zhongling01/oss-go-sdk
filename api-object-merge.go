@@ -266,19 +266,23 @@ func (c *Client) DeleteObjectWithId(ctx context.Context, id, bucketName, objectN
 }
 
 func (c *Client) PutMergeObjectTagging(ctx context.Context, bucketName, id string, otags *tags.Tags, opts PutObjectTaggingOptions) error {
-	err := c.PutObjectTagging(ctx, bucketName, MergeDir+IdxPrefix+id, otags, opts)
+	err := c.PutObjectTagging(ctx, bucketName, MergeDir+DataPrefix+id, otags, opts)
 	if err != nil {
 		return err
 	}
 
-	err = c.PutObjectTagging(ctx, bucketName, MergeDir+DataPrefix+id, otags, opts)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return c.PutObjectTagging(ctx, bucketName, MergeDir+IdxPrefix+id, otags, opts)
 }
 
 func (c *Client) GetMergeObjectTagging(ctx context.Context, bucketName, id string, opts GetObjectTaggingOptions) (*tags.Tags, error) {
-	return c.GetObjectTagging(ctx, bucketName, MergeDir+IdxPrefix+id, opts)
+	return c.GetObjectTagging(ctx, bucketName, MergeDir+DataPrefix+id, opts)
+}
+
+func (c *Client) RemoveMergeObjectTagging(ctx context.Context, bucketName, id string, opts RemoveObjectTaggingOptions) error {
+	err := c.RemoveObjectTagging(ctx, bucketName, MergeDir+DataPrefix+id, opts)
+	if err != nil {
+		return err
+	}
+
+	return c.RemoveObjectTagging(ctx, bucketName, MergeDir+IdxPrefix+id, opts)
 }
