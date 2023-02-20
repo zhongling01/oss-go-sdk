@@ -89,7 +89,8 @@ type PutObjectOptions struct {
 	DisableContentSha256    bool
 	DisableMultipart        bool
 	/* trinet*/
-	UpdateInfo         UpdateInfo
+	MergeMultipart     bool       // merge all parts in CompleteMultipartUpload
+	UpdateInfo         UpdateInfo // partial update
 	AmzSnowballExtract bool
 	/* trinet*/
 	Internal AdvancedPutOptions
@@ -186,6 +187,9 @@ func (opts PutObjectOptions) Header() (header http.Header) {
 	}
 	if opts.AmzSnowballExtract {
 		header.Set(AmzSnowballExtract, "true")
+	}
+	if opts.MergeMultipart {
+		header.Set(MinioMergeMultipart, "true")
 	}
 	/* trinet*/
 

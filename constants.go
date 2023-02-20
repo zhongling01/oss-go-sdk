@@ -109,5 +109,6 @@ const (
 	MinIOPartialUpdateMode   = "X-Minio-Partial-Update-Mode"
 	MinIOPartialUpdateOffset = "X-Minio-Partial-Update-Offset"
 	AmzSnowballExtract       = "X-Amz-Meta-Snowball-Auto-Extract"
+	MinioMergeMultipart      = "X-Minio-Merge-Multipart"
 	/* trinet*/
 )
