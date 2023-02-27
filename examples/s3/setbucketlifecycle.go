@@ -24,8 +24,8 @@ import (
 	"context"
 	"log"
 
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/credentials"
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/lifecycle"
+	"github.com/trinet2005/oss-go-sdk/pkg/credentials"
+	"github.com/trinet2005/oss-go-sdk/pkg/lifecycle"
 )
 
 func main() {

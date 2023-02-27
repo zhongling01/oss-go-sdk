@@ -22,7 +22,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/encrypt"
+	"github.com/trinet2005/oss-go-sdk/pkg/encrypt"
 )
 
 // AdvancedGetOptions for internal use by MinIO server - not intended for client use.

@@ -1,4 +1,4 @@
-module github.com/ZeroLuKa/trinet-oss-go-sdk
+module github.com/trinet2005/oss-go-sdk
 
 go 1.17
 

@@ -21,7 +21,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/set"
+	"github.com/trinet2005/oss-go-sdk/pkg/set"
 )
 
 // ConditionKeyMap.Add() is called and the result is validated.

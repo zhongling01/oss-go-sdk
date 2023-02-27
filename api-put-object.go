@@ -30,8 +30,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/encrypt"
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/s3utils"
+	"github.com/trinet2005/oss-go-sdk/pkg/encrypt"
+	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
 	"golang.org/x/net/http/httpguts"
 )
 

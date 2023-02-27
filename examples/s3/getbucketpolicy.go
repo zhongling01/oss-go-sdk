@@ -27,7 +27,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/credentials"
+	"github.com/trinet2005/oss-go-sdk/pkg/credentials"
 )
 
 func main() {

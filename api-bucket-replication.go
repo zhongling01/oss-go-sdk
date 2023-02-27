@@ -28,8 +28,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/replication"
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/s3utils"
+	"github.com/trinet2005/oss-go-sdk/pkg/replication"
+	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
 )
 
 // RemoveBucketReplication removes a replication config on an existing bucket.

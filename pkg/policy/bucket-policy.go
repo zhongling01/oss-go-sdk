@@ -23,7 +23,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/set"
+	"github.com/trinet2005/oss-go-sdk/pkg/set"
 )
 
 // BucketPolicy - Bucket level policy.

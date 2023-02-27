@@ -23,7 +23,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/s3utils"
+	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
 )
 
 // FPutObject - Create an object in a bucket, with contents from file at filePath. Allows request cancellation.

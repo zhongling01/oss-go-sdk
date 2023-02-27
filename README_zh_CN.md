@@ -41,7 +41,7 @@ import (
 	"log"
 
 	"github.com/minio/minio-go/v7"
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/credentials"
+	"github.com/trinet2005/oss-go-sdk/pkg/credentials"
 )
 
 func main() {
@@ -77,7 +77,7 @@ import (
 	"log"
 
 	"github.com/minio/minio-go/v7"
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/credentials"
+	"github.com/trinet2005/oss-go-sdk/pkg/credentials"
 )
 
 func main() {

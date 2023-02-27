@@ -38,9 +38,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/credentials"
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/s3utils"
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/signer"
+	"github.com/trinet2005/oss-go-sdk/pkg/credentials"
+	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
+	"github.com/trinet2005/oss-go-sdk/pkg/signer"
 	md5simd "github.com/minio/md5-simd"
 	"golang.org/x/net/publicsuffix"
 )

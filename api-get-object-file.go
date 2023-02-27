@@ -23,7 +23,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/s3utils"
+	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
 )
 
 // FGetObject - download contents of an object to a local file.

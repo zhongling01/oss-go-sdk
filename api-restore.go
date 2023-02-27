@@ -24,8 +24,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/s3utils"
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/tags"
+	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
+	"github.com/trinet2005/oss-go-sdk/pkg/tags"
 )
 
 // RestoreType represents the restore request type

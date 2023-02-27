@@ -30,7 +30,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/s3utils"
+	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
 )
 
 // putObjectMultipartStream - upload a large object using

@@ -22,7 +22,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/s3utils"
+	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
 )
 
 // BucketExists verifies if bucket exists and you have permission to access it. Allows for a Context to

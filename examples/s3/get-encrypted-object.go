@@ -26,8 +26,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/credentials"
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/encrypt"
+	"github.com/trinet2005/oss-go-sdk/pkg/credentials"
+	"github.com/trinet2005/oss-go-sdk/pkg/encrypt"
 )
 
 func main() {

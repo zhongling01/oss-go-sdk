@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/tags"
+	"github.com/trinet2005/oss-go-sdk/pkg/tags"
 	uuid2 "github.com/google/uuid"
 	"io"
 	"time"

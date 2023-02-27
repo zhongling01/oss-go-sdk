@@ -25,9 +25,9 @@ import (
 	"path"
 	"sync"
 
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/credentials"
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/s3utils"
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/signer"
+	"github.com/trinet2005/oss-go-sdk/pkg/credentials"
+	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
+	"github.com/trinet2005/oss-go-sdk/pkg/signer"
 )
 
 // bucketLocationCache - Provides simple mechanism to hold bucket

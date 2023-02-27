@@ -23,7 +23,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/set"
+	"github.com/trinet2005/oss-go-sdk/pkg/set"
 )
 
 // EventType is a S3 notification event associated to the bucket notification configuration

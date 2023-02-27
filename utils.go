@@ -39,8 +39,8 @@ import (
 	"time"
 
 	md5simd "github.com/minio/md5-simd"
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/encrypt"
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/s3utils"
+	"github.com/trinet2005/oss-go-sdk/pkg/encrypt"
+	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
 	"github.com/minio/sha256-simd"
 )
 

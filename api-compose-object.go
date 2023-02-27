@@ -28,8 +28,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/encrypt"
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/s3utils"
+	"github.com/trinet2005/oss-go-sdk/pkg/encrypt"
+	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
 )
 
 // CopyDestOptions represents options specified by user for CopyObject/ComposeObject APIs

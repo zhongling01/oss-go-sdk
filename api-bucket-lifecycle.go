@@ -25,8 +25,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/lifecycle"
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/s3utils"
+	"github.com/trinet2005/oss-go-sdk/pkg/lifecycle"
+	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
 )
 
 // SetBucketLifecycle set the lifecycle on an existing bucket.

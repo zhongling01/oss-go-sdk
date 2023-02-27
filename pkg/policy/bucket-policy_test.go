@@ -23,7 +23,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ZeroLuKa/trinet-oss-go-sdk/pkg/set"
+	"github.com/trinet2005/oss-go-sdk/pkg/set"
 )
 
 // TestUnmarshalBucketPolicy tests unmarsheling various examples
