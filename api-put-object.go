@@ -89,13 +89,14 @@ type PutObjectOptions struct {
 	DisableContentSha256    bool
 	DisableMultipart        bool
 	/* trinet*/
-	MergeMultipart     bool       // merge all parts in CompleteMultipartUpload
-	UpdateInfo         UpdateInfo // partial update
+	MergeMultipart     bool              // merge all parts in CompleteMultipartUpload and trans to a normal object
+	PartialUpdateInfo  PartialUpdateInfo // partial update
 	AmzSnowballExtract bool
 	/* trinet*/
 	Internal AdvancedPutOptions
 }
-type UpdateInfo struct {
+
+type PartialUpdateInfo struct {
 	UpdateMode   string
 	UpdateOffset string
 }
@@ -181,9 +182,9 @@ func (opts PutObjectOptions) Header() (header http.Header) {
 		header.Set(minIOBucketReplicationTaggingTimestamp, opts.Internal.TaggingTimestamp.Format(time.RFC3339Nano))
 	}
 	/* trinet*/
-	if opts.UpdateInfo.UpdateMode != "" && opts.UpdateInfo.UpdateOffset != "" {
-		header.Set(MinIOPartialUpdateMode, opts.UpdateInfo.UpdateMode)
-		header.Set(MinIOPartialUpdateOffset, opts.UpdateInfo.UpdateOffset)
+	if opts.PartialUpdateInfo.UpdateMode != "" && opts.PartialUpdateInfo.UpdateOffset != "" {
+		header.Set(MinIOPartialUpdateMode, opts.PartialUpdateInfo.UpdateMode)
+		header.Set(MinIOPartialUpdateOffset, opts.PartialUpdateInfo.UpdateOffset)
 	}
 	if opts.AmzSnowballExtract {
 		header.Set(AmzSnowballExtract, "true")
@@ -266,14 +267,14 @@ func (c *Client) UpdateObject(updateOffset int, updateMod, bucketName, objectNam
 		return UploadInfo{}, errors.New("Update file is too small, Update can't use steaming upload")
 	}
 
-	updateInfo := UpdateInfo{
+	updateInfo := PartialUpdateInfo{
 		UpdateMode:   updateMod,
 		UpdateOffset: strconv.Itoa(updateOffset),
 	}
 	opts := PutObjectOptions{
-		UpdateInfo:       updateInfo,
-		DisableMultipart: true,
-		PartSize:         maxPartSize,
+		PartialUpdateInfo: updateInfo,
+		DisableMultipart:  true,
+		PartSize:          maxPartSize,
 	}
 
 	return c.PutObject(context.Background(), bucketName, objectName, reader, objectSize, opts)
