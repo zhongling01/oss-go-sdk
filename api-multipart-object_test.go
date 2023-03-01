@@ -69,11 +69,11 @@ func TestClient_MultipartUpload(t *testing.T) {
 			t.Fatal(uerr)
 		}
 		//TODO: 读取已上传分段
-		r, _, err := m.GetPart(context.Background(), partNumber)
-		if err != nil {
-			t.Fatal(err)
-		}
-		r.Close()
+		//r, _, err := m.GetPart(context.Background(), partNumber)
+		//if err != nil {
+		//	t.Fatal(err)
+		//}
+		//r.Close()
 
 		partNumber++
 	}

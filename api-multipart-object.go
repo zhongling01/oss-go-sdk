@@ -52,9 +52,9 @@ func (c *Client) NewUploadID(ctx context.Context, bucketName, objectName string,
 	} else if objectSize < 0 {
 		objectSize = -1
 	} else if objectSize > 0 {
-		if opts.MergeMultipart {
-			return nil, errors.New("MergeMultipart cannot be set if objectSize is greater than 0")
-		}
+		//if opts.MergeMultipart {
+		//	return nil, errors.New("MergeMultipart cannot be set if objectSize is greater than 0")
+		//}
 		//TODO: 服务端需预分配空间
 	}
 
@@ -184,6 +184,7 @@ func (m *MultipartUploader) UpdatePart(ctx context.Context, data io.Reader, part
 	return m.uploadPart(ctx, buf, length, partNumber)
 }
 
+// TODO: 服务端暂未支持
 func (m *MultipartUploader) GetPart(ctx context.Context, partNumber int) (io.ReadCloser, ObjectInfo, error) {
 	if partNumber > len(m.partsInfo) {
 		return nil, ObjectInfo{}, errors.New("partNumber is illegal")
