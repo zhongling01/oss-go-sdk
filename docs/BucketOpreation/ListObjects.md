@@ -9,20 +9,20 @@
 __参数__
 
 
-| 参数         | 类型                 | 描述       |
-| :----------- | :------------------- | :--------- |
-| `ctx`        | _context.Context_    | 上下文控制 |
-| `bucketName` | _string_             | 存储桶名称 |
-| `opts`       | _ListObjectsOptions_ | 列举选项   |
+| 参数         | 类型                           | 描述       |
+| :----------- | :----------------------------- | :--------- |
+| `ctx`        | _context.Context_              | 上下文控制 |
+| `bucketName` | _string_                       | 存储桶名称 |
+| `opts`       | ossClient._ListObjectsOptions_ | 列举选项   |
 
 
 
-| ListObjectsOptions | 类型     | 描述                                                         |
-| ------------------ | -------- | ------------------------------------------------------------ |
-| `Prefix`           | _string_ | 填写`Prefix`将列举出以`Prefix`为前缀的对象                   |
-| `recursive`        | _bool_   | `true`代表递归查找，`false`代表类似文件夹查找，以'/'分隔，不查子文件夹。默认为`false` |
-| `MaxKeys`          | _int_    | 每次请求的返回最大数量,最大值为1000，设置超出1000则会应用为1000 |
-| `WithVersions`     | _bool_   | `true`代表在列出的信息中包含对象的所有版本的版本号，`false`则不会包含，默认为`false` |
+| ossClient.ListObjectsOptions | 类型     | 描述                                                         |
+| ---------------------------- | -------- | ------------------------------------------------------------ |
+| `Prefix`                     | _string_ | 填写`Prefix`将列举出以`Prefix`为前缀的对象                   |
+| `recursive`                  | _bool_   | `true`代表递归查找，`false`代表类似文件夹查找，以'/'分隔，不查子文件夹。默认为`false` |
+| `MaxKeys`                    | _int_    | 每次请求的返回最大数量,最大值为1000，设置超出1000则会应用为1000 |
+| `WithVersions`               | _bool_   | `true`代表在列出的信息中包含对象的所有版本的版本号，`false`则不会包含，默认为`false` |
 
 
 

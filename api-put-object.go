@@ -347,8 +347,8 @@ func (c *Client) putObjectCommon(ctx context.Context, bucketName, objectName str
 	if size < int64(partSize) || opts.DisableMultipart {
 		return c.putObject(ctx, bucketName, objectName, reader, size, opts)
 	}
-
 	return c.putObjectMultipartStream(ctx, bucketName, objectName, reader, size, opts)
+
 }
 
 func (c *Client) putObjectMultipartStreamNoLength(ctx context.Context, bucketName, objectName string, reader io.Reader, opts PutObjectOptions) (info UploadInfo, err error) {
