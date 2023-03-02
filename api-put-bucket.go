@@ -66,13 +66,16 @@ func (c *Client) doMakeBucket(ctx context.Context, bucketName string, location s
 	}
 
 	/* trinet*/
-	if opts.ObjectLocking || opts.RecycleEnabled {
+	if opts.ObjectLocking || opts.RecycleEnabled || opts.PublicAccess {
 		headers := make(http.Header)
 		if opts.ObjectLocking {
 			headers.Add("x-amz-bucket-object-lock-enabled", "true")
 		}
 		if opts.RecycleEnabled {
 			headers.Add("X-Minio-Bucket-Recycle-Enabled", "true")
+		}
+		if opts.PublicAccess {
+			headers.Add("X-Minio-Public-Access", "true")
 		}
 		reqMetadata.customHeader = headers
 	}
@@ -118,6 +121,8 @@ type MakeBucketOptions struct {
 	ObjectLocking bool
 	/* trinet :recycle bucket */
 	RecycleEnabled bool
+	PublicAccess   bool // Access Policy
+	/* trinet */
 }
 
 // MakeBucket creates a new bucket with bucketName with a context to control cancellations and timeouts.
