@@ -12,31 +12,32 @@
 
 一共有插入和替换两种类型，对应字符串"Insert" 和 "Replace"
 
-- - 举例：原数据为 12345，要更新的数据为678
+- 举例：原数据为 12345，要更新的数据为678
 
-- - - insert模式，offset为0，更新后数据为67812345
+  - insert模式，offset为0，更新后数据为67812345
 
-    - insert模式，offset为1，更新后数据为16782345
+  - insert模式，offset为1，更新后数据为16782345
 
-    - insert模式，offset为5，更新后数据为12345678
+  - insert模式，offset为5，更新后数据为12345678
 
-    - insert模式，offset为-1，更新后数据为12345678
+  - insert模式，offset为-1，更新后数据为12345678
 
-    - insert模式，offset为6，返回错误
+  - insert模式，offset为6，返回错误
 
-    - replace模式，offset为0，更新后数据为67845
+  - replace模式，offset为0，更新后数据为67845
 
-    - replace模式，offset为1，更新后数据为16785
+  - replace模式，offset为1，更新后数据为16785
 
-    - replace模式，offset为4，更新后数据为1234678
+  - replace模式，offset为4，更新后数据为1234678
 
-    - replace模式，offset为5，更新后数据为12345678
+  - replace模式，offset为5，更新后数据为12345678
 
-    - replace模式，offset为-1，更新后数据为12345678
+  - replace模式，offset为-1，更新后数据为12345678
 
-    - replace模式，offset为6，返回错误
+  - replace模式，offset为6，返回错误
 
-      
+    
+
 
 __参数__
 
@@ -47,7 +48,7 @@ __参数__
 | `updateMod`     | _string_          | 更新的模式，对应字符串"Insert" 和 "Replace" |
 | `bucketName`    | _string_          | 存储桶名称                                  |
 | `reader`        | _io.Reader_       | 任意实现了io.Reader的GO类型                 |
-| `objectSize`    | _int64_           | 更新对象的大小                              |
+| `objectSize`    | _int64_           | 更新对象的大小，需要填写                    |
 
 
 

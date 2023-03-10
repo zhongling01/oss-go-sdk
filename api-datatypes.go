@@ -30,6 +30,9 @@ type BucketInfo struct {
 	Name string `json:"name"`
 	// Date the bucket was created.
 	CreationDate time.Time `json:"creationDate"`
+	/* trinet */
+	RecyclEnabled bool `json:"recyclEnabled"`
+	/* trinet */
 }
 
 // StringMap represents map with custom UnmarshalXML

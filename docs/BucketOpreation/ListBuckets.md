@@ -15,10 +15,11 @@ __参数__
 
 
 
-| BucketInfo            | 类型        | 描述             |
-| --------------------- | ----------- | ---------------- |
-| `bucket.Name`         | _string_    | 存储桶名称       |
-| `bucket.CreationDate` | _time.Time_ | 存储桶的创建时间 |
+| BucketInfo              | 类型        | 描述                       |
+| ----------------------- | ----------- | -------------------------- |
+| `bucket.Name`           | _string_    | 存储桶名称                 |
+| `bucket.CreationDate`   | _time.Time_ | 存储桶的创建时间           |
+| `bucket.RecycleEnabled` | _bool_      | 存储桶是否开启了回收站功能 |
 
 
 
