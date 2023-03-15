@@ -17,6 +17,12 @@
 package ossClient
 
 import (
+	"bytes"
+	"context"
+	"errors"
+	"fmt"
+	"github.com/trinet2005/oss-go-sdk/pkg/credentials"
+	"io"
 	"testing"
 )
 
@@ -61,3 +67,143 @@ func TestPutObjectOptionsValidate(t *testing.T) {
 		}
 	}
 }
+
+/* trinet */
+func testPartialUpdate(originData []byte, mode string, offset int64, newData io.Reader, originSize, bodySize int64, expect string) error {
+	opts := &Options{
+		Creds: credentials.NewStaticV4("minioadmin", "minioadmin", ""),
+	}
+	client, err := New("127.0.0.1:19000", opts)
+	if err != nil {
+		return err
+	}
+	bucket := "test-bucket"
+	object := "test-partial-obj"
+	client.MakeBucket(context.Background(), bucket, MakeBucketOptions{ForceCreate: true})
+	defer client.RemoveBucketWithOptions(context.Background(), bucket, RemoveBucketOptions{ForceDelete: true})
+
+	// 上传一个初始的对象
+	_, err = client.PutObject(context.Background(), bucket, object, bytes.NewReader(originData), originSize, PutObjectOptions{})
+	if err != nil {
+		return err
+	}
+	defer client.RemoveObject(context.Background(), bucket, object, RemoveObjectOptions{})
+
+	// 验证局部更新
+	_, err = client.UpdateObject(int(offset), mode, bucket, object, newData, bodySize)
+	if err != nil {
+		return err
+	}
+	gr, err := client.GetObject(context.Background(), bucket, object, GetObjectOptions{})
+
+	data, err := io.ReadAll(gr)
+	if err != nil {
+		return err
+	}
+
+	//println(expect)
+	if string(data) != expect {
+		return errors.New(fmt.Sprintf("expect: %s, but get:%s\n", expect, string(data)))
+	}
+
+	return nil
+}
+
+// 测试局部更新Insert模式
+func TestPartialUpdateInsert(t *testing.T) {
+	var offset, size int64
+
+	origin := "12345"
+	newData := "678"
+
+	originData := []byte(origin)
+	originSize := int64(len(originData))
+	size = int64(len(newData))
+
+	offset = 0
+	expect := origin[:offset] + newData + origin[offset:]
+	err := testPartialUpdate(originData, PartialUpdateInsertMode, offset, bytes.NewReader([]byte(newData)), originSize, size, expect)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	offset = 1
+	expect = origin[:offset] + newData + origin[offset:]
+	err = testPartialUpdate(originData, PartialUpdateInsertMode, offset, bytes.NewReader([]byte(newData)), originSize, size, expect)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	offset = originSize
+	expect = origin[:offset] + newData + origin[offset:]
+	err = testPartialUpdate(originData, PartialUpdateInsertMode, offset, bytes.NewReader([]byte(newData)), originSize, size, expect)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	offset = originSize + 1
+	expect = "test error case"
+	err = testPartialUpdate(originData, PartialUpdateInsertMode, offset, bytes.NewReader([]byte(newData)), originSize, size, expect)
+	if err == nil {
+		t.Fatal("want error")
+	} else {
+		t.Log(err)
+	}
+}
+
+// 测试局部更新Replace模式
+func TestPartialUpdateReplace(t *testing.T) {
+	var offset, size int64
+	var expect string
+
+	origin := "12345"
+	newData := "678"
+
+	originData := []byte(origin)
+	originSize := int64(len(originData))
+	size = int64(len(newData))
+
+	offset = 0
+	if offset+size < originSize {
+		expect = origin[:offset] + newData + origin[offset+size:]
+	} else {
+		expect = origin[:offset] + newData
+	}
+	err := testPartialUpdate(originData, PartialUpdateReplaceMode, offset, bytes.NewReader([]byte(newData)), originSize, size, expect)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	offset = 1
+	if offset+size < originSize {
+		expect = origin[:offset] + newData + origin[offset+size:]
+	} else {
+		expect = origin[:offset] + newData
+	}
+	err = testPartialUpdate(originData, PartialUpdateReplaceMode, offset, bytes.NewReader([]byte(newData)), originSize, size, expect)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	offset = originSize
+	if offset+size < originSize {
+		expect = origin[:offset] + newData + origin[offset+size:]
+	} else {
+		expect = origin[:offset] + newData
+	}
+	err = testPartialUpdate(originData, PartialUpdateReplaceMode, offset, bytes.NewReader([]byte(newData)), originSize, size, expect)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	offset = originSize + 1
+	expect = "test error case"
+	err = testPartialUpdate(originData, PartialUpdateReplaceMode, offset, bytes.NewReader([]byte(newData)), originSize, size, expect)
+	if err == nil {
+		t.Fatal("want error")
+	} else {
+		t.Log(err)
+	}
+}
+
+/* trinet */
