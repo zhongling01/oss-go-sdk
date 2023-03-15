@@ -32,8 +32,8 @@ func TestClient_MultipartUpload(t *testing.T) {
 	bucketName := "test-bucket"
 	objectName := "test-object"
 	c.makeBucket(context.Background(), bucketName, MakeBucketOptions{})
-	//defer c.removeObject(context.Background(), bucketName, objectName, RemoveObjectOptions{})
-	//defer c.RemoveBucket(context.Background(), bucketName)
+	defer c.RemoveBucket(context.Background(), bucketName)
+	defer c.removeObject(context.Background(), bucketName, objectName, RemoveObjectOptions{})
 
 	reader := &TestMultipart{
 		size: 1024 * 1024 * 16,
