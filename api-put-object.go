@@ -96,10 +96,18 @@ type PutObjectOptions struct {
 	Internal AdvancedPutOptions
 }
 
+/* trinet */
+const (
+	PartialUpdateInsertMode  = "Insert"
+	PartialUpdateReplaceMode = "Replace"
+)
+
 type PartialUpdateInfo struct {
 	UpdateMode   string
 	UpdateOffset string
 }
+
+/* trinet */
 
 // getNumThreads - gets the number of threads to be used in the multipart
 // put object operation
@@ -254,7 +262,7 @@ func (c *Client) ExtractOnline(ctx context.Context, bucketName string, reader io
 }
 
 func (c *Client) UpdateObject(updateOffset int, updateMod, bucketName, objectName string, reader io.Reader, objectSize int64) (UploadInfo, error) {
-	if updateMod != "Insert" && updateMod != "Replace" {
+	if updateMod != PartialUpdateInsertMode && updateMod != PartialUpdateReplaceMode {
 		return UploadInfo{}, errors.New("unsupported mode")
 	}
 	if updateOffset < -1 {

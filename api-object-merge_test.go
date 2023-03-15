@@ -264,3 +264,27 @@ func TestClient_Vacancy(t *testing.T) {
 		}
 	}
 }
+
+// 测试开启版本控制的bucket操作失败
+func TestClient_MergePartUpload2VersiondBucket(t *testing.T) {
+	// 创建测试的bucket
+	id := ""
+	bucket := "test-merge"
+	opts := &Options{
+		Creds: credentials.NewStaticV4("minioadmin", "minioadmin", ""),
+	}
+	client, err := New("127.0.0.1:19000", opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = client.MakeBucket(context.Background(), bucket, MakeBucketOptions{
+		ObjectLocking: true,
+	})
+	defer client.RemoveBucket(context.Background(), bucket)
+
+	// 合并上传
+	p, err := client.InitMergePartUpload(id, bucket)
+	if p != nil || err == nil {
+		t.Fatal("can't operate on versiond bucket")
+	}
+}
