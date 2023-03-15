@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-//RandomStr 随机生成字符串
+// RandomStr 随机生成字符串
 func RandomStr(length int) string {
 	str := "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+{}|:<>;."
 	bytes := []byte(str)
@@ -125,7 +125,7 @@ func TestClient_BaseMergePartUpload(t *testing.T) {
 	}
 	for k, v := range tagMap {
 		if _, ok := ret.ToMap()[k]; !ok || ret.ToMap()[k] != v {
-			t.Fatal("tag check success")
+			t.Fatal("tag check failed")
 		}
 	}
 
@@ -260,7 +260,7 @@ func TestClient_Vacancy(t *testing.T) {
 	}
 	for k, v := range tagMap {
 		if _, ok := ret.ToMap()[k]; !ok || ret.ToMap()[k] != v {
-			t.Fatal("tag check success")
+			t.Fatal("tag check failed")
 		}
 	}
 }
