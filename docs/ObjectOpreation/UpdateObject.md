@@ -66,7 +66,7 @@ __示例：__
 
 
 ```go
-//初始化客户端
+//初始化客户端以调用SDK
 opts := &ossClient.Options{
     Creds: credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
 }
@@ -77,8 +77,8 @@ if err != nil {
 }
 
 //准备更新文件
-updateMode := PartialUpdateInsertMode
-
+updateMode 		:= PartialUpdateInsertMode		//更新模式
+updateOffset	:= 10						  //更新的偏移量
 reader, err := os.Open(updatefilePath)
 if err != nil {
     fmt.Printf("Open file Error: %v\n", err)
@@ -95,7 +95,7 @@ if err != nil {
 objectSize := fileStat.Size()
 
 //更新对象
-_, err := client.UpdateObject(2, updateMode, bucketName, objectName, reader, objectSize)
+_, err := client.UpdateObject(updateOffset, updateMode, bucketName, objectName, reader, objectSize)
 if err != nil {
     fmt.Printf("Update Error:%v\n", err)
     return
@@ -104,3 +104,14 @@ if err != nil {
 fmt.Printf("update file success length:[%d] mode:[%s]\n", objectSize, updateMode)
 ```
 
+场景：
+
+updatefilePath下的文件原数据为12345，
+
+reader内要更新的数据为678，
+
+updateOffset偏移量为0，
+
+updateMode更新模式为insert时
+
+更新后数据为67812345

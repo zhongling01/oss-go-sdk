@@ -52,7 +52,7 @@ if err != nil {
 }
 
 // 打开相关文件
-fileReader, err := os.Open("E:\\testData\\test\\ziptest\\ziptest.gzip")
+fileReader, err := os.Open("123.tar")
 if err != nil {
     log.Fatal(err)
 }
@@ -68,10 +68,33 @@ if err != nil {
 fileSize := fileStat.Size()
 
 //在线解压缩上传
-info, err := client.ExtractOnline(context.Background(), bucketName, fileReader, fileSize)
+_, err := client.ExtractOnline(context.Background(), bucketName, fileReader, fileSize)
 if err != nil {
     log.Fatal(err)
 }
-fmt.Println(info)
+//列出在线解压缩后的内容
+ch := client.ListObjects(context.Background(), bucketName, ossClient.ListObjectsOptions{
+		Recursive: true,
+	})
+	for i := range ch {
+		fmt.Println(i.Key)
+}
+
 ```
+
+样例中123.tar解压后的文件组织为
+
+123/
+123/1.txt
+123/2.txt
+123/3/
+123/3/3.txt
+
+则上传至桶中的组织结构为
+
+123/
+123/1.txt
+123/2.txt
+123/3/
+123/3/3.txt
 

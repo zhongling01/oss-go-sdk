@@ -11,6 +11,7 @@
 * [`BucketExists`](./docs/BucketOpreation/BucketExists.md)
 * [`RemoveBucket`](./docs/BucketOpreation/RemoveBucket.md)
 * [`ListObjects`](./docs/BucketOpreation/ListObjects.md)
+* [`RecycleBucket`](./docs/BucketOpreation/RecycleBucket.md)
 * 桶标签
 * [`SetBucketTagging`](./docs/BucketOpreation/SetBucketTagging.md)
 * [`GetBucketTagging`](./docs/BucketOpreation/GetBucketTagging.md)
