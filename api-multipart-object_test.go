@@ -2,8 +2,10 @@ package ossClient
 
 import (
 	"context"
+	"fmt"
 	"github.com/trinet2005/oss-go-sdk/pkg/credentials"
 	"io"
+	"strings"
 	"testing"
 )
 
@@ -46,8 +48,8 @@ func TestClient_MultipartUpload(t *testing.T) {
 		PartSize:         absMinPartSize,
 	}
 	// Initiate a new multipart upload.
-	//TODO：传入objectSize的时候可以预分配空间，而不需要MergeMultipart标志位
-	m, err := c.NewUploadID(context.Background(), bucketName, objectName, -1, opts)
+	// TODO：实现断点续传
+	m, err := c.NewUploadID(context.Background(), bucketName, objectName, opts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -61,6 +63,7 @@ func TestClient_MultipartUpload(t *testing.T) {
 	// Part number always starts with '1'
 	partNumber := 1
 	for partNumber <= maxPartsCount {
+		reader.data = strings.Repeat(fmt.Sprintf("%d", partNumber), 10)
 		uerr := m.UploadPart(context.Background(), reader, partNumber)
 		if uerr != nil {
 			if uerr == io.EOF {
@@ -68,12 +71,19 @@ func TestClient_MultipartUpload(t *testing.T) {
 			}
 			t.Fatal(uerr)
 		}
-		//TODO: 读取已上传分段
-		//r, _, err := m.GetPart(context.Background(), partNumber)
-		//if err != nil {
-		//	t.Fatal(err)
-		//}
-		//r.Close()
+		go func(partNumber int) {
+			// 读取已上传分段
+			r, _, err := m.GetPart(context.Background(), partNumber)
+			if err != nil {
+				t.Fatal(err)
+			}
+			tmpBuf, err := io.ReadAll(r)
+			if err != nil {
+				t.Fatal(err)
+			}
+			t.Log(string(tmpBuf[:20]))
+			r.Close()
+		}(partNumber)
 
 		partNumber++
 	}
@@ -83,10 +93,22 @@ func TestClient_MultipartUpload(t *testing.T) {
 		size: 1024 * 1024 * 10,
 		data: "abcdefg",
 	}
-	uerr := m.UpdatePart(context.Background(), reader, 1, reader.size)
+	changePartNum := 2
+	uerr := m.UpdatePart(context.Background(), reader, changePartNum, reader.size)
 	if uerr != nil && uerr != io.EOF {
 		t.Fatal(uerr)
 	}
+	// 读取更改的片段
+	r, _, err := m.GetPart(context.Background(), changePartNum)
+	if err != nil {
+		t.Fatal(err)
+	}
+	tmpBuf, err := io.ReadAll(r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(string(tmpBuf[:20]))
+	r.Close()
 
 	// 测试最后一个分段可以小于限制大小
 	reader = &TestMultipart{
@@ -97,6 +119,17 @@ func TestClient_MultipartUpload(t *testing.T) {
 	if uerr != nil && uerr != io.EOF {
 		t.Fatal(uerr)
 	}
+	// 读取更改的片段
+	r, _, err = m.GetPart(context.Background(), len(m.partsInfo))
+	if err != nil {
+		t.Fatal(err)
+	}
+	tmpBuf, err = io.ReadAll(r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(string(tmpBuf[:20]))
+	r.Close()
 
 	uploadInfo, err := m.CompleteMultipartUpload(context.Background())
 	if err != nil {

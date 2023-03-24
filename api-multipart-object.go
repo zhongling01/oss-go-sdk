@@ -35,28 +35,26 @@ type MultipartUploader struct {
 	buf        []byte
 	// Create checksums
 	// CRC32C is ~50% faster on AMD64 @ 30GB/s
-	crcBytes map[int][]byte
-	crc      hash.Hash32
-	eof      bool // The sequential upload has been completed, now can UpdatePart or CompleteMultipartUpload
+	crcBytes  map[int][]byte
+	crc       hash.Hash32
+	eof       bool // The sequential upload has been completed, now can UpdatePart or CompleteMultipartUpload
+	completed bool
 }
 
 // getUploadID - fetch upload id if already present for an object name
 // or initiate a new request to fetch a new upload id.
-func (c *Client) NewUploadID(ctx context.Context, bucketName, objectName string, objectSize int64, opts *PutObjectOptions) (*MultipartUploader, error) {
+func (c *Client) NewUploadID(ctx context.Context, bucketName, objectName string, opts *PutObjectOptions) (*MultipartUploader, error) {
 	if opts.DisableMultipart {
 		return nil, errors.New("multipart disabled")
 	}
 
-	if objectSize == 0 {
-		return nil, errors.New("objectSize is illegal")
-	} else if objectSize < 0 {
-		objectSize = -1
-	} else if objectSize > 0 {
-		//if opts.MergeMultipart {
-		//	return nil, errors.New("MergeMultipart cannot be set if objectSize is greater than 0")
-		//}
-		//TODO: 服务端需预分配空间
-	}
+	var objectSize int64 = -1
+	//if objectSize == 0 {
+	//	return nil, errors.New("objectSize is illegal")
+	//}
+	//if objectSize < 0 {
+	//	objectSize = -1
+	//}
 
 	_, _, _, err := OptimalPartInfo(objectSize, opts.PartSize)
 	if err != nil {
@@ -156,8 +154,8 @@ func (m *MultipartUploader) UploadPart(ctx context.Context, data io.Reader, part
 
 // UpdatePart - Update the uploaded part.
 func (m *MultipartUploader) UpdatePart(ctx context.Context, data io.Reader, partNumber int, configuredPartSize int) error {
-	if !m.eof {
-		return errors.New("UploadPart doesn't end")
+	if m.completed {
+		return errors.New("upload is completed")
 	}
 
 	if partNumber < len(m.partsInfo) {
@@ -184,8 +182,15 @@ func (m *MultipartUploader) UpdatePart(ctx context.Context, data io.Reader, part
 	return m.uploadPart(ctx, buf, length, partNumber)
 }
 
-// TODO: 服务端暂未支持
 func (m *MultipartUploader) GetPart(ctx context.Context, partNumber int) (io.ReadCloser, ObjectInfo, error) {
+	return m.getPart(ctx, partNumber, GetObjectOptions{})
+}
+
+func (m *MultipartUploader) getPart(ctx context.Context, partNumber int, opts GetObjectOptions) (io.ReadCloser, ObjectInfo, error) {
+	if m.completed {
+		return nil, ObjectInfo{}, errors.New("upload is completed")
+	}
+
 	if partNumber > len(m.partsInfo) {
 		return nil, ObjectInfo{}, errors.New("partNumber is illegal")
 	}
@@ -198,7 +203,7 @@ func (m *MultipartUploader) GetPart(ctx context.Context, partNumber int) (io.Rea
 		bucketName:       m.BucketName,
 		objectName:       m.ObjectName,
 		queryValues:      urlValues,
-		customHeader:     GetObjectOptions{}.Header(),
+		customHeader:     opts.Header(),
 		contentSHA256Hex: emptySHA256Hex,
 	})
 	if err != nil {
@@ -224,6 +229,10 @@ func (m *MultipartUploader) CompleteMultipartUpload(ctx context.Context) (Upload
 	if !m.eof {
 		return UploadInfo{}, errors.New("UploadPart doesn't end")
 	}
+	if m.completed {
+		return UploadInfo{}, errors.New("upload is completed")
+	}
+	m.completed = true
 
 	// Complete multipart upload.
 	var complete completeMultipartUpload
