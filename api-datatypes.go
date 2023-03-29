@@ -31,7 +31,9 @@ type BucketInfo struct {
 	// Date the bucket was created.
 	CreationDate time.Time `json:"creationDate"`
 	/* trinet */
-	RecycleEnabled bool `json:"recycleEnabled"`
+	RecycleEnabled bool   `json:"recycleEnabled"`
+	Size           uint64 `json:"size"`
+	ObjectsCount   uint64 `json:"objectsCount"`
 	/* trinet */
 }
 
