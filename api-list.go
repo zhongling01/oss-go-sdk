@@ -19,6 +19,7 @@ package ossClient
 
 import (
 	"context"
+	"encoding/xml"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -699,6 +700,48 @@ func (o *ListObjectsOptions) Set(key, value string) {
 	o.headers.Set(key, value)
 }
 
+/*trinet*/
+type getBucketDetailInfo struct {
+	XMLName      xml.Name `xml:"GetBucketDetailInfo"`
+	CreationDate string   `xml:"CreationDate"`
+	Size         string   `xml:"Size"`
+	ObjNum       string   `xml:"ObjNum"`
+}
+
+// GetBucketDetailInfo get the bucket creat time size and object count
+func (c *Client) GetBucketDetailInfo(ctx context.Context, bucketName string) (string, string, string, error) {
+	// Input validation.
+	if err := s3utils.CheckValidBucketName(bucketName); err != nil {
+		return "", "", "", err
+	}
+
+	urlValues := make(url.Values)
+	urlValues.Set("getBucketDetailInfo", "")
+
+	// Execute PUT on bucket.
+	resp, err := c.executeMethod(ctx, http.MethodGet, requestMetadata{
+		bucketName:       bucketName,
+		contentSHA256Hex: emptySHA256Hex,
+		queryValues:      urlValues,
+	})
+	defer closeResponse(resp)
+	if err != nil {
+		return "", "", "", err
+	}
+	if resp != nil {
+		if resp.StatusCode != http.StatusOK {
+			return "", "", "", httpRespToErrorResponse(resp, bucketName, "")
+		}
+	}
+	info := &getBucketDetailInfo{}
+	if err = xml.NewDecoder(resp.Body).Decode(info); err != nil {
+		return "", "", "", err
+	}
+
+	return info.CreationDate, info.Size, info.ObjNum, nil
+}
+
+/*trinet*/
 // ListObjects returns objects list after evaluating the passed options.
 //
 //	api := client.New(....)

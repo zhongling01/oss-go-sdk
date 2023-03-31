@@ -20,6 +20,8 @@ __SelectObjectOptions__
 | `InputSerialization`  | SelectObjectInputSerialization  | 设置select目标对象的数据格式  |
 | `OutputSerialization` | SelectObjectOutputSerialization | 设置输出结果的数据格式        |
 
+
+
 __SelectObjectInputSerializationt 目标对象的数据格式__
 
 | 字段              | 类型                 | 描述                                                         |
