@@ -2,12 +2,11 @@ package ossClient
 
 import (
 	"context"
-	"fmt"
+	madmin "github.com/trinet2005/oss-admin-go"
 	"github.com/trinet2005/oss-go-sdk/pkg/credentials"
 	"github.com/trinet2005/oss-go-sdk/pkg/tags"
 	"io"
 	"math/rand"
-	"net/http"
 	"strconv"
 	"strings"
 	"testing"
@@ -218,16 +217,12 @@ func TestClient_Vacancy(t *testing.T) {
 	}
 
 	// 手动合并空洞
-	targetUrl := fmt.Sprintf("http://127.0.0.1:19000/minio/admin/v3/manual-merge-vacancy")
-	req, err := http.NewRequest("PUT", targetUrl, nil)
+	adminClient, err := madmin.New("127.0.0.1:19000", "minioadmin", "minioadmin", false)
 	if err != nil {
 		t.Fatal(err)
 	}
-	resp, err := http.DefaultClient.Do(req)
+	err = adminClient.ManualMergeVacancy(context.Background())
 	if err != nil {
-		t.Fatal(err)
-	}
-	if resp.StatusCode != http.StatusOK {
 		t.Fatal(err)
 	}
 
