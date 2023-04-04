@@ -39,7 +39,7 @@ import (
 //	}
 func (c *Client) ListBuckets(ctx context.Context, listRecycle bool) ([]BucketInfo, error) {
 	// Execute GET on service.
-	/* trinet*/
+	/* trinet */
 	var customHeader http.Header
 	if listRecycle {
 		headers := make(http.Header)
@@ -51,7 +51,7 @@ func (c *Client) ListBuckets(ctx context.Context, listRecycle bool) ([]BucketInf
 		contentSHA256Hex: emptySHA256Hex,
 		customHeader:     customHeader,
 	})
-	/* trinet*/
+	/* trinet */
 
 	defer closeResponse(resp)
 	if err != nil {
@@ -700,7 +700,7 @@ func (o *ListObjectsOptions) Set(key, value string) {
 	o.headers.Set(key, value)
 }
 
-/*trinet*/
+/* trinet */
 type getBucketDetailInfo struct {
 	XMLName      xml.Name `xml:"GetBucketDetailInfo"`
 	CreationDate string   `xml:"CreationDate"`
@@ -741,7 +741,8 @@ func (c *Client) GetBucketDetailInfo(ctx context.Context, bucketName string) (st
 	return info.CreationDate, info.Size, info.ObjNum, nil
 }
 
-/*trinet*/
+/* trinet */
+
 // ListObjects returns objects list after evaluating the passed options.
 //
 //	api := client.New(....)
