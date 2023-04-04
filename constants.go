@@ -105,10 +105,10 @@ const (
 	minioTgtReplicationReady = "X-Minio-Replication-Ready"
 	// Header asks if delete marker replication request can be sent by source now.
 	isMinioTgtReplicationReady = "X-Minio-Check-Replication-Ready"
-	/* trinet*/
+	/* trinet */
 	MinIOPartialUpdateMode   = "X-Minio-Partial-Update-Mode"
 	MinIOPartialUpdateOffset = "X-Minio-Partial-Update-Offset"
 	AmzSnowballExtract       = "X-Amz-Meta-Snowball-Auto-Extract"
 	MinioMergeMultipart      = "X-Minio-Merge-Multipart"
-	/* trinet*/
+	/* trinet */
 )

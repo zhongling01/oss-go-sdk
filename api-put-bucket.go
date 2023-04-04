@@ -65,7 +65,7 @@ func (c *Client) doMakeBucket(ctx context.Context, bucketName string, location s
 		bucketLocation: location,
 	}
 
-	/* trinet*/
+	/* trinet */
 	if opts.ObjectLocking || opts.RecycleEnabled || opts.PublicAccess || opts.ForceCreate {
 		headers := make(http.Header)
 		if opts.ObjectLocking {
@@ -82,7 +82,7 @@ func (c *Client) doMakeBucket(ctx context.Context, bucketName string, location s
 		}
 		reqMetadata.customHeader = headers
 	}
-	/* trinet*/
+	/* trinet */
 
 	// If location is not 'us-east-1' create bucket location config.
 	if location != "us-east-1" && location != "" {

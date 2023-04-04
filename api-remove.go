@@ -80,7 +80,7 @@ func (c *Client) RemoveBucketWithOptions(ctx context.Context, bucketName string,
 	return nil
 }
 
-//* trinet*/
+/* trinet */
 
 // RecycleBucket recycle the bucket
 func (c *Client) RecycleBucket(ctx context.Context, bucketName string) error {
@@ -111,7 +111,7 @@ func (c *Client) RecycleBucket(ctx context.Context, bucketName string) error {
 	return nil
 }
 
-//* trinet*/
+/* trinet */
 
 // RemoveBucket deletes the bucket name.
 //

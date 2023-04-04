@@ -38,7 +38,7 @@ import (
 //	}
 func (c *Client) ListBuckets(ctx context.Context, listRecycle bool) ([]BucketInfo, error) {
 	// Execute GET on service.
-	/* trinet*/
+	/* trinet */
 	var customHeader http.Header
 	if listRecycle {
 		headers := make(http.Header)
@@ -50,7 +50,7 @@ func (c *Client) ListBuckets(ctx context.Context, listRecycle bool) ([]BucketInf
 		contentSHA256Hex: emptySHA256Hex,
 		customHeader:     customHeader,
 	})
-	/* trinet*/
+	/* trinet */
 
 	defer closeResponse(resp)
 	if err != nil {
