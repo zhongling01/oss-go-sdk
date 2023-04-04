@@ -3,6 +3,7 @@ package ossClient
 import (
 	"context"
 	"fmt"
+	uuid2 "github.com/google/uuid"
 	"github.com/trinet2005/oss-go-sdk/pkg/credentials"
 	"io"
 	"strings"
@@ -31,7 +32,7 @@ func TestClient_MultipartUpload(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	bucketName := "test-bucket"
+	bucketName := "test-bucket" + uuid2.New().String()
 	objectName := "test-object"
 	c.makeBucket(context.Background(), bucketName, MakeBucketOptions{})
 	defer c.RemoveBucket(context.Background(), bucketName)

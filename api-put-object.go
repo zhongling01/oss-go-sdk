@@ -88,11 +88,11 @@ type PutObjectOptions struct {
 	SendContentMd5          bool
 	DisableContentSha256    bool
 	DisableMultipart        bool
-	/* trinet*/
+	/* trinet */
 	MergeMultipart     bool              // merge all parts in CompleteMultipartUpload and trans to a normal object
 	PartialUpdateInfo  PartialUpdateInfo // partial update
 	AmzSnowballExtract bool
-	/* trinet*/
+	/* trinet */
 	Internal AdvancedPutOptions
 }
 
@@ -189,7 +189,7 @@ func (opts PutObjectOptions) Header() (header http.Header) {
 	if !opts.Internal.TaggingTimestamp.IsZero() {
 		header.Set(minIOBucketReplicationTaggingTimestamp, opts.Internal.TaggingTimestamp.Format(time.RFC3339Nano))
 	}
-	/* trinet*/
+	/* trinet */
 	if opts.PartialUpdateInfo.UpdateMode != "" && opts.PartialUpdateInfo.UpdateOffset != "" {
 		header.Set(MinIOPartialUpdateMode, opts.PartialUpdateInfo.UpdateMode)
 		header.Set(MinIOPartialUpdateOffset, opts.PartialUpdateInfo.UpdateOffset)
@@ -200,7 +200,7 @@ func (opts PutObjectOptions) Header() (header http.Header) {
 	if opts.MergeMultipart {
 		header.Set(MinioMergeMultipart, "true")
 	}
-	/* trinet*/
+	/* trinet */
 
 	if len(opts.UserTags) != 0 {
 		header.Set(amzTaggingHeader, s3utils.TagEncode(opts.UserTags))
