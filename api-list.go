@@ -700,7 +700,7 @@ func (o *ListObjectsOptions) Set(key, value string) {
 	o.headers.Set(key, value)
 }
 
-/*trinet*/
+/* trinet */
 type getBucketDetailInfo struct {
 	XMLName      xml.Name `xml:"GetBucketDetailInfo"`
 	CreationDate string   `xml:"CreationDate"`
@@ -741,7 +741,8 @@ func (c *Client) GetBucketDetailInfo(ctx context.Context, bucketName string) (st
 	return info.CreationDate, info.Size, info.ObjNum, nil
 }
 
-/*trinet*/
+/* trinet */
+
 // ListObjects returns objects list after evaluating the passed options.
 //
 //	api := client.New(....)
