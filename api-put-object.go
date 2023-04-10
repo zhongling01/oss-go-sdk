@@ -91,6 +91,7 @@ type PutObjectOptions struct {
 	/* trinet */
 	MergeMultipart     bool              // merge all parts in CompleteMultipartUpload and trans to a normal object
 	PartialUpdateInfo  PartialUpdateInfo // partial update
+	AppendMode         bool              // append write, and PartialUpdateInfo parameters conflict
 	AmzSnowballExtract bool
 	/* trinet */
 	Internal AdvancedPutOptions
@@ -194,6 +195,11 @@ func (opts PutObjectOptions) Header() (header http.Header) {
 		header.Set(MinIOPartialUpdateMode, opts.PartialUpdateInfo.UpdateMode)
 		header.Set(MinIOPartialUpdateOffset, opts.PartialUpdateInfo.UpdateOffset)
 	}
+	if opts.AppendMode {
+		// TODO: 目前使用局部更新的方式来实现，后续优化成增加part的方式
+		header.Set(MinIOPartialUpdateMode, PartialUpdateInsertMode)
+		header.Set(MinIOPartialUpdateOffset, "-1")
+	}
 	if opts.AmzSnowballExtract {
 		header.Set(AmzSnowballExtract, "true")
 	}
@@ -218,6 +224,13 @@ func (opts PutObjectOptions) Header() (header http.Header) {
 
 // validate() checks if the UserMetadata map has standard headers or and raises an error if so.
 func (opts PutObjectOptions) validate() (err error) {
+	if opts.AppendMode && opts.PartialUpdateInfo.UpdateMode != "" {
+		return errInvalidArgument("AppendMode and PartialUpdateInfo parameters conflict")
+	}
+	if (opts.AppendMode || opts.PartialUpdateInfo.UpdateMode != "") && !opts.DisableMultipart {
+		return errInvalidArgument("AppendMode and PartialUpdateInfo parameters not support in multipart upload mode")
+	}
+
 	for k, v := range opts.UserMetadata {
 		if !httpguts.ValidHeaderFieldName(k) || isStandardHeader(k) || isSSEHeader(k) || isStorageClassHeader(k) {
 			return errInvalidArgument(k + " unsupported user defined metadata name")
@@ -243,6 +256,7 @@ func (a completedParts) Len() int           { return len(a) }
 func (a completedParts) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a completedParts) Less(i, j int) bool { return a[i].PartNumber < a[j].PartNumber }
 
+/* trinet */
 func (c *Client) ExtractOnline(ctx context.Context, bucketName string, reader io.Reader, objectSize int64,
 ) (info UploadInfo, err error) {
 	if objectSize >= maxPartSize {
@@ -261,7 +275,8 @@ func (c *Client) ExtractOnline(ctx context.Context, bucketName string, reader io
 	return c.PutObject(ctx, bucketName, objectName, reader, objectSize, opts)
 }
 
-func (c *Client) UpdateObject(updateOffset int, updateMod, bucketName, objectName string, reader io.Reader, objectSize int64) (UploadInfo, error) {
+func (c *Client) UpdateObject(ctx context.Context, bucketName, objectName string, updateMod string, updateOffset int,
+	reader io.Reader, objectSize int64) (UploadInfo, error) {
 	if updateMod != PartialUpdateInsertMode && updateMod != PartialUpdateReplaceMode {
 		return UploadInfo{}, errors.New("unsupported mode")
 	}
@@ -269,10 +284,10 @@ func (c *Client) UpdateObject(updateOffset int, updateMod, bucketName, objectNam
 		return UploadInfo{}, errors.New("offset must be greater than -1")
 	}
 	if objectSize >= maxPartSize {
-		return UploadInfo{}, errors.New("Update file is too large")
+		return UploadInfo{}, errors.New("update file is too large")
 	}
 	if objectSize < 0 {
-		return UploadInfo{}, errors.New("Update file is too small, Update can't use steaming upload")
+		return UploadInfo{}, errors.New("update file is too small, Update can't use steaming upload")
 	}
 
 	updateInfo := PartialUpdateInfo{
@@ -285,9 +300,27 @@ func (c *Client) UpdateObject(updateOffset int, updateMod, bucketName, objectNam
 		PartSize:          maxPartSize,
 	}
 
-	return c.PutObject(context.Background(), bucketName, objectName, reader, objectSize, opts)
-
+	return c.PutObject(ctx, bucketName, objectName, reader, objectSize, opts)
 }
+
+func (c *Client) AppendObject(ctx context.Context, bucketName, objectName string, reader io.Reader, objectSize int64) (UploadInfo, error) {
+	if objectSize >= maxPartSize {
+		return UploadInfo{}, errors.New("update file is too large")
+	}
+	if objectSize < 0 {
+		return UploadInfo{}, errors.New("update file is too small, Update can't use steaming upload")
+	}
+
+	opts := PutObjectOptions{
+		AppendMode:       true,
+		DisableMultipart: true,
+		PartSize:         maxPartSize,
+	}
+
+	return c.PutObject(ctx, bucketName, objectName, reader, objectSize, opts)
+}
+
+/* trinet */
 
 // PutObject creates an object in a bucket.
 //
