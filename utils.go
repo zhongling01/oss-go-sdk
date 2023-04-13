@@ -39,9 +39,9 @@ import (
 	"time"
 
 	md5simd "github.com/minio/md5-simd"
+	"github.com/minio/sha256-simd"
 	"github.com/trinet2005/oss-go-sdk/pkg/encrypt"
 	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
-	"github.com/minio/sha256-simd"
 )
 
 func trimEtag(etag string) string {
@@ -509,6 +509,23 @@ func isAmzHeader(headerKey string) bool {
 	key := strings.ToLower(headerKey)
 
 	return strings.HasPrefix(key, "x-amz-meta-") || strings.HasPrefix(key, "x-amz-grant-") || key == "x-amz-acl" || isSSEHeader(headerKey) || strings.HasPrefix(key, "x-amz-checksum-")
+}
+
+// supportedQueryValues is a list of query strings that can be passed in when using GetObject.
+var supportedQueryValues = map[string]bool{
+	"partNumber":                   true,
+	"versionId":                    true,
+	"response-cache-control":       true,
+	"response-content-disposition": true,
+	"response-content-encoding":    true,
+	"response-content-language":    true,
+	"response-content-type":        true,
+	"response-expires":             true,
+}
+
+// isStandardQueryValue will return true when the passed in query string parameter is supported rather than customized.
+func isStandardQueryValue(qsKey string) bool {
+	return supportedQueryValues[qsKey]
 }
 
 var (

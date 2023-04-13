@@ -65,6 +65,7 @@ func TestClient_MultipartUpload(t *testing.T) {
 	partNumber := 1
 	for partNumber <= maxPartsCount {
 		reader.data = strings.Repeat(fmt.Sprintf("%d", partNumber), 10)
+		checkusum := strings.Repeat(fmt.Sprintf("%d", partNumber), 20)
 		uerr := m.UploadPart(context.Background(), reader, partNumber)
 		if uerr != nil {
 			if uerr == io.EOF {
@@ -72,7 +73,7 @@ func TestClient_MultipartUpload(t *testing.T) {
 			}
 			t.Fatal(uerr)
 		}
-		go func(partNumber int) {
+		go func(partNumber int, checkusum string) {
 			// 读取已上传分段
 			r, _, err := m.GetPart(context.Background(), partNumber)
 			if err != nil {
@@ -82,9 +83,12 @@ func TestClient_MultipartUpload(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			t.Log(string(tmpBuf[:20]))
+			if string(tmpBuf[:20]) != checkusum {
+				t.Log(string(tmpBuf[:20]))
+				t.Fatal(fmt.Sprintf("read data error, checksum is %s", checkusum))
+			}
 			r.Close()
-		}(partNumber)
+		}(partNumber, checkusum)
 
 		partNumber++
 	}
