@@ -32,9 +32,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/trinet2005/oss-go-sdk/pkg/encrypt"
 	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
-	"github.com/google/uuid"
 )
 
 func (c *Client) putObjectMultipart(ctx context.Context, bucketName, objectName string, reader io.Reader, size int64,
@@ -387,6 +387,12 @@ func (c *Client) completeMultipartUpload(ctx context.Context, bucketName, object
 		return UploadInfo{}, err
 	}
 
+	headers := opts.Header()
+	if s3utils.IsAmazonEndpoint(*c.endpointURL) {
+		headers.Del(encrypt.SseKmsKeyID)      // Remove X-Amz-Server-Side-Encryption-Aws-Kms-Key-Id not supported in CompleteMultipartUpload
+		headers.Del(encrypt.SseGenericHeader) // Remove X-Amz-Server-Side-Encryption not supported in CompleteMultipartUpload
+	}
+
 	// Instantiate all the complete multipart buffer.
 	completeMultipartUploadBuffer := bytes.NewReader(completeMultipartUploadBytes)
 	reqMetadata := requestMetadata{
@@ -396,7 +402,7 @@ func (c *Client) completeMultipartUpload(ctx context.Context, bucketName, object
 		contentBody:      completeMultipartUploadBuffer,
 		contentLength:    int64(len(completeMultipartUploadBytes)),
 		contentSHA256Hex: sum256Hex(completeMultipartUploadBytes),
-		customHeader:     opts.Header(),
+		customHeader:     headers,
 	}
 
 	// Execute POST to complete multipart upload for an objectName.
