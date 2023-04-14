@@ -67,6 +67,20 @@ type AdvancedPutOptions struct {
 	LegalholdTimestamp time.Time
 }
 
+/* trinet: the user can choose which engine's pool to save data to */
+
+type ErasurePoolEngine string
+
+const (
+	DefaultEngine ErasurePoolEngine = ""
+	HDD           ErasurePoolEngine = "HDD"
+	SSD           ErasurePoolEngine = "SSD"
+	//ElasticSearchHDD ErasurePoolEngine = "ElasticSearch+HDD"
+	//ElasticSearchSSD ErasurePoolEngine = "ElasticSearch+SSD"
+)
+
+/* trinet */
+
 // PutObjectOptions represents options specified by user for PutObject call
 type PutObjectOptions struct {
 	UserMetadata            map[string]string
@@ -95,10 +109,11 @@ type PutObjectOptions struct {
 	ConcurrentStreamParts bool
 
 	/* trinet */
-	MergeMultipart     bool              // merge all parts in CompleteMultipartUpload and trans to a normal object
-	PartialUpdateInfo  PartialUpdateInfo // partial update
-	AppendMode         bool              // append write, and PartialUpdateInfo parameters conflict
-	AmzSnowballExtract bool
+	MergeMultipart      bool              // merge all parts in CompleteMultipartUpload and trans to a normal object
+	PartialUpdateInfo   PartialUpdateInfo // partial update
+	AppendMode          bool              // append write, and PartialUpdateInfo parameters conflict
+	PreferredEnginePool ErasurePoolEngine // the user can choose which engine's pool to save data to
+	AmzSnowballExtract  bool
 	/* trinet */
 
 	Internal AdvancedPutOptions
@@ -235,6 +250,9 @@ func (opts PutObjectOptions) Header() (header http.Header) {
 	if opts.MergeMultipart {
 		header.Set(MinioMergeMultipart, "true")
 	}
+	if opts.PreferredEnginePool != "" {
+		header.Set(MinioPoolEngine, string(opts.PreferredEnginePool))
+	}
 	/* trinet */
 
 	if len(opts.UserTags) != 0 {
@@ -265,6 +283,9 @@ func (opts PutObjectOptions) validate() (err error) {
 	}
 	if (opts.AppendMode || opts.PartialUpdateInfo.UpdateMode != "") && !opts.DisableMultipart {
 		return errInvalidArgument("AppendMode and PartialUpdateInfo parameters not support in multipart upload mode")
+	}
+	if opts.PreferredEnginePool != "" && (opts.AppendMode || opts.PartialUpdateInfo.UpdateMode != "") {
+		return errInvalidArgument("PreferredEnginePool parameter is only used to transfer new objects")
 	}
 	/* trinet */
 

@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"github.com/trinet2005/oss-go-sdk/pkg/credentials"
 	"io"
+	"strings"
 	"testing"
 )
 
@@ -79,7 +80,10 @@ func testPartialUpdate(originData []byte, mode string, offset int64, newData io.
 	}
 	bucket := "test-bucket"
 	object := "test-partial-obj"
-	client.MakeBucket(context.Background(), bucket, MakeBucketOptions{ForceCreate: true})
+	err = client.MakeBucket(context.Background(), bucket, MakeBucketOptions{ForceCreate: true})
+	if err != nil {
+		return err
+	}
 	defer client.RemoveBucketWithOptions(context.Background(), bucket, RemoveBucketOptions{ForceDelete: true})
 
 	// 上传一个初始的对象
@@ -216,7 +220,10 @@ func testAppend(originData []byte, newData io.Reader, originSize, bodySize int64
 	}
 	bucket := "test-bucket"
 	object := "test-append-obj"
-	client.MakeBucket(context.Background(), bucket, MakeBucketOptions{ForceCreate: true})
+	err = client.MakeBucket(context.Background(), bucket, MakeBucketOptions{ForceCreate: true})
+	if err != nil {
+		return err
+	}
 	defer client.RemoveBucketWithOptions(context.Background(), bucket, RemoveBucketOptions{ForceDelete: true})
 
 	// 上传一个初始的对象
@@ -262,6 +269,78 @@ func TestAppendObject(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+// 测试写入指定存储引擎池
+func TestPreferredEnginePool(t *testing.T) {
+	opts := &Options{
+		Creds: credentials.NewStaticV4("minioadmin", "minioadmin", ""),
+	}
+	client, err := New("127.0.0.1:19000", opts)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	//  ====== 测试基础的引擎 ======
+	bucket := "test-pool-engine-bucket"
+	object := "test-obj"
+	err = client.MakeBucket(context.Background(), bucket, MakeBucketOptions{ForceCreate: true})
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	defer client.RemoveBucketWithOptions(context.Background(), bucket, RemoveBucketOptions{ForceDelete: true})
+
+	data := "test"
+	size := int64(len(data))
+	for _, engine := range []ErasurePoolEngine{DefaultEngine, HDD, SSD} {
+		// 使用debug，去服务端看是否正确写入存储池
+		_, err = client.PutObject(context.Background(), bucket, object, strings.NewReader(data), size,
+			PutObjectOptions{PreferredEnginePool: engine})
+		if err != nil {
+			t.Fatal(err.Error())
+		}
+		err = client.RemoveObject(context.Background(), bucket, object, RemoveObjectOptions{})
+		if err != nil {
+			t.Fatal(err.Error())
+		}
+	}
+
+	_, err = client.PutObject(context.Background(), bucket, object, strings.NewReader(data), size,
+		PutObjectOptions{PreferredEnginePool: HDD})
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	// ====== 测试 CopyObject ======
+	src := CopySrcOptions{
+		Bucket: bucket,
+		Object: object,
+	}
+	dstBucket := "test-pool-engine-bucket-dst"
+	err = client.MakeBucket(context.Background(), dstBucket, MakeBucketOptions{ForceCreate: true})
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	defer client.RemoveBucketWithOptions(context.Background(), dstBucket, RemoveBucketOptions{ForceDelete: true})
+	dst := CopyDestOptions{
+		Bucket: dstBucket,
+		Object: object,
+		Size:   size,
+	}
+	_, err = client.CopyObject(context.Background(), dst, src)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	err = client.RemoveObject(context.Background(), dstBucket, object, RemoveObjectOptions{})
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	// ====== 测试multipart模式 ======
+	// 见 TestClient_MultipartUploadPreferredEnginePool
+
+	// TODO: 测试decommissioning
 }
 
 /* trinet */
