@@ -25,6 +25,37 @@ func (t *TestMultipart) Read(p []byte) (n int, err error) {
 	return
 }
 
+// 测试原生的multipart
+func TestClient_OriginMultipartUpload(t *testing.T) {
+	c, err := New("127.0.0.1:19000", &Options{
+		Creds: credentials.NewStaticV4("minioadmin", "minioadmin", ""),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	bucketName := "test-bucket" + uuid2.New().String()
+	objectName := "test-object"
+	c.makeBucket(context.Background(), bucketName, MakeBucketOptions{})
+	defer c.RemoveBucket(context.Background(), bucketName)
+	defer c.removeObject(context.Background(), bucketName, objectName, RemoveObjectOptions{})
+
+	reader := &TestMultipart{
+		size: 1024 * 1024 * 16,
+		data: "0123456789",
+	}
+
+	opts := PutObjectOptions{
+		DisableMultipart: false,
+		PartSize:         absMinPartSize,
+	}
+	info, err := c.PutObject(context.Background(), bucketName, objectName, reader, -1, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log(info)
+}
+
 func TestClient_MultipartUpload(t *testing.T) {
 	c, err := New("127.0.0.1:19000", &Options{
 		Creds: credentials.NewStaticV4("minioadmin", "minioadmin", ""),
@@ -53,6 +84,7 @@ func TestClient_MultipartUpload(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Log(m.UploadID)
 
 	defer func() {
 		if err != nil {
