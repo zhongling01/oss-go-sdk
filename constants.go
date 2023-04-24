@@ -106,10 +106,11 @@ const (
 	// Header asks if delete marker replication request can be sent by source now.
 	isMinioTgtReplicationReady = "X-Minio-Check-Replication-Ready"
 	/* trinet */
-	MinIOPartialUpdateMode   = "X-Minio-Partial-Update-Mode"
-	MinIOPartialUpdateOffset = "X-Minio-Partial-Update-Offset"
-	AmzSnowballExtract       = "X-Amz-Meta-Snowball-Auto-Extract"
-	MinioMergeMultipart      = "X-Minio-Merge-Multipart"
-	MinioPoolEngine          = "X-Minio-Pool-Engine"
+	MinIOPartialUpdateMode       = "X-Minio-Partial-Update-Mode"
+	MinIOPartialUpdateOffset     = "X-Minio-Partial-Update-Offset"
+	AmzSnowballExtract           = "X-Amz-Meta-Snowball-Auto-Extract"
+	MinIOMergeMultipart          = "X-Minio-Merge-Multipart"
+	MinIOPoolEngine              = "X-Minio-Pool-Engine"
+	MinIODelBucketParallelDrives = "X-Minio-Del-Bucket-Parallel-Drives"
 	/* trinet */
 )

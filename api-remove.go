@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/xml"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -36,10 +37,21 @@ type BucketOptions = RemoveBucketOptions
 
 //revive:enable
 
+/* trinet */
+
+type AdvancedDeleteBucketOptions struct {
+	ParallelDrives int // maximum number of parallelism
+}
+
+/* trinet */
+
 // RemoveBucketOptions special headers to purge buckets, only
 // useful when endpoint is MinIO
 type RemoveBucketOptions struct {
 	ForceDelete bool
+	/* trinet */
+	Internal AdvancedDeleteBucketOptions
+	/* trinet */
 }
 
 // RemoveBucketWithOptions deletes the bucket name.
@@ -58,6 +70,9 @@ func (c *Client) RemoveBucketWithOptions(ctx context.Context, bucketName string,
 	if opts.ForceDelete {
 		headers.Set(minIOForceDelete, "true")
 	}
+	/* trinet */
+	headers.Set(MinIODelBucketParallelDrives, fmt.Sprintf("%d", opts.Internal.ParallelDrives))
+	/* trinet */
 
 	// Execute DELETE on bucket.
 	resp, err := c.executeMethod(ctx, http.MethodDelete, requestMetadata{

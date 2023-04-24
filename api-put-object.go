@@ -248,10 +248,10 @@ func (opts PutObjectOptions) Header() (header http.Header) {
 		header.Set(AmzSnowballExtract, "true")
 	}
 	if opts.MergeMultipart {
-		header.Set(MinioMergeMultipart, "true")
+		header.Set(MinIOMergeMultipart, "true")
 	}
 	if opts.PreferredEnginePool != "" {
-		header.Set(MinioPoolEngine, string(opts.PreferredEnginePool))
+		header.Set(MinIOPoolEngine, string(opts.PreferredEnginePool))
 	}
 	/* trinet */
 
