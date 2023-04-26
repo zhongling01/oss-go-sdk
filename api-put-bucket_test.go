@@ -46,3 +46,22 @@ func TestClient_MakeBucketForceCreate(t *testing.T) {
 	}
 	defer c.RemoveBucket(context.Background(), bucketName)
 }
+
+func TestClient_MakeBucketRecycleEnabled(t *testing.T) {
+	c, err := New("127.0.0.1:19000", &Options{
+		Creds: credentials.NewStaticV4("minioadmin", "minioadmin", ""),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	bucketName := "test-bucket-recycle-option"
+
+	err = c.MakeBucket(context.Background(), bucketName, MakeBucketOptions{
+		RecycleEnabled: true,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.RemoveBucket(context.Background(), bucketName)
+	defer c.RemoveBucket(context.Background(), bucketName)
+}

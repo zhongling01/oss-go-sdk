@@ -272,9 +272,12 @@ func TestClient_MergePartUpload2VersiondBucket(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_ = client.MakeBucket(context.Background(), bucket, MakeBucketOptions{
+	err = client.MakeBucket(context.Background(), bucket, MakeBucketOptions{
 		ObjectLocking: true,
 	})
+	if err != nil {
+		t.Fatal(err)
+	}
 	defer client.RemoveBucket(context.Background(), bucket)
 
 	// 合并上传
