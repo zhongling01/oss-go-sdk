@@ -7,8 +7,8 @@ import (
 )
 
 func TestClient_MakeBucketPublicAccess(t *testing.T) {
-	c, err := New("127.0.0.1:19000", &Options{
-		Creds: credentials.NewStaticV4("minioadmin", "minioadmin", ""),
+	c, err := New(EndpointDefault, &Options{
+		Creds: credentials.NewStaticV4(AccessKeyIDDefault, SecretAccessKeyDefault, ""),
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -25,8 +25,8 @@ func TestClient_MakeBucketPublicAccess(t *testing.T) {
 }
 
 func TestClient_MakeBucketForceCreate(t *testing.T) {
-	c, err := New("127.0.0.1:19000", &Options{
-		Creds: credentials.NewStaticV4("minioadmin", "minioadmin", ""),
+	c, err := New(EndpointDefault, &Options{
+		Creds: credentials.NewStaticV4(AccessKeyIDDefault, SecretAccessKeyDefault, ""),
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -48,8 +48,8 @@ func TestClient_MakeBucketForceCreate(t *testing.T) {
 }
 
 func TestClient_MakeBucketRecycleEnabled(t *testing.T) {
-	c, err := New("127.0.0.1:19000", &Options{
-		Creds: credentials.NewStaticV4("minioadmin", "minioadmin", ""),
+	c, err := New(EndpointDefault, &Options{
+		Creds: credentials.NewStaticV4(AccessKeyIDDefault, SecretAccessKeyDefault, ""),
 	})
 	if err != nil {
 		t.Fatal(err)
