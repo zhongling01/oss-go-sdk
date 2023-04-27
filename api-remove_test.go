@@ -8,9 +8,9 @@ import (
 
 func TestClient_RemoveBucketWithOptions(t *testing.T) {
 	opts := &Options{
-		Creds: credentials.NewStaticV4("minioadmin", "minioadmin", ""),
+		Creds: credentials.NewStaticV4(AccessKeyIDDefault, SecretAccessKeyDefault, ""),
 	}
-	c, err := New("127.0.0.1:19000", opts)
+	c, err := New(EndpointDefault, opts)
 	if err != nil {
 		t.Fatal(err.Error())
 	}

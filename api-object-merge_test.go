@@ -40,9 +40,9 @@ func TestClient_BaseMergePartUpload(t *testing.T) {
 	id := ""
 	bucket := "test-merge"
 	opts := &Options{
-		Creds: credentials.NewStaticV4("minioadmin", "minioadmin", ""),
+		Creds: credentials.NewStaticV4(AccessKeyIDDefault, SecretAccessKeyDefault, ""),
 	}
-	client, err := New("127.0.0.1:19000", opts)
+	client, err := New(EndpointDefault, opts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -157,9 +157,9 @@ func TestClient_Vacancy(t *testing.T) {
 	id := ""
 	bucket := "test-merge"
 	opts := &Options{
-		Creds: credentials.NewStaticV4("minioadmin", "minioadmin", ""),
+		Creds: credentials.NewStaticV4(AccessKeyIDDefault, SecretAccessKeyDefault, ""),
 	}
-	client, err := New("127.0.0.1:19000", opts)
+	client, err := New(EndpointDefault, opts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -217,7 +217,7 @@ func TestClient_Vacancy(t *testing.T) {
 	}
 
 	// 手动合并空洞
-	adminClient, err := madmin.New("127.0.0.1:19000", "minioadmin", "minioadmin", false)
+	adminClient, err := madmin.New(EndpointDefault, AccessKeyIDDefault, SecretAccessKeyDefault, false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -266,9 +266,9 @@ func TestClient_MergePartUpload2VersiondBucket(t *testing.T) {
 	id := ""
 	bucket := "test-merge"
 	opts := &Options{
-		Creds: credentials.NewStaticV4("minioadmin", "minioadmin", ""),
+		Creds: credentials.NewStaticV4(AccessKeyIDDefault, SecretAccessKeyDefault, ""),
 	}
-	client, err := New("127.0.0.1:19000", opts)
+	client, err := New(EndpointDefault, opts)
 	if err != nil {
 		t.Fatal(err)
 	}

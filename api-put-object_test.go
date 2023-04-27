@@ -72,9 +72,9 @@ func TestPutObjectOptionsValidate(t *testing.T) {
 /* trinet */
 func testPartialUpdate(originData []byte, mode string, offset int64, newData io.Reader, originSize, bodySize int64, expect string) error {
 	opts := &Options{
-		Creds: credentials.NewStaticV4("minioadmin", "minioadmin", ""),
+		Creds: credentials.NewStaticV4(AccessKeyIDDefault, SecretAccessKeyDefault, ""),
 	}
-	client, err := New("127.0.0.1:19000", opts)
+	client, err := New(EndpointDefault, opts)
 	if err != nil {
 		return err
 	}
@@ -212,9 +212,9 @@ func TestPartialUpdateReplace(t *testing.T) {
 
 func testAppend(originData []byte, newData io.Reader, originSize, bodySize int64, expect string) error {
 	opts := &Options{
-		Creds: credentials.NewStaticV4("minioadmin", "minioadmin", ""),
+		Creds: credentials.NewStaticV4(AccessKeyIDDefault, SecretAccessKeyDefault, ""),
 	}
-	client, err := New("127.0.0.1:19000", opts)
+	client, err := New(EndpointDefault, opts)
 	if err != nil {
 		return err
 	}
@@ -274,9 +274,9 @@ func TestAppendObject(t *testing.T) {
 // 测试写入指定存储引擎池
 func TestPreferredEnginePool(t *testing.T) {
 	opts := &Options{
-		Creds: credentials.NewStaticV4("minioadmin", "minioadmin", ""),
+		Creds: credentials.NewStaticV4(AccessKeyIDDefault, SecretAccessKeyDefault, ""),
 	}
-	client, err := New("127.0.0.1:19000", opts)
+	client, err := New(EndpointDefault, opts)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
