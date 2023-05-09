@@ -112,5 +112,6 @@ const (
 	MinIOMergeMultipart          = "X-Minio-Merge-Multipart"
 	MinIOPoolEngine              = "X-Minio-Pool-Engine"
 	MinIODelBucketParallelDrives = "X-Minio-Del-Bucket-Parallel-Drives"
+	MinIODelPrefixParallelDrives = "X-Minio-Del-Prefix-Parallel-Drives"
 	/* trinet */
 )
