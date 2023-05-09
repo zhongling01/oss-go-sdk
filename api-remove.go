@@ -164,6 +164,9 @@ type AdvancedRemoveOptions struct {
 	ReplicationStatus       ReplicationStatus
 	ReplicationMTime        time.Time
 	ReplicationRequest      bool
+	/* trinet */
+	DeletePrefixParallelDrives int // maximum number of parallelism
+	/* trinet */
 }
 
 // RemoveObjectOptions represents options specified by user for RemoveObject call
@@ -219,6 +222,9 @@ func (c *Client) removeObject(ctx context.Context, bucketName, objectName string
 	if opts.ForceDelete {
 		headers.Set(minIOForceDelete, "true")
 	}
+	/* trinet */
+	headers.Set(MinIODelPrefixParallelDrives, fmt.Sprintf("%d", opts.Internal.DeletePrefixParallelDrives))
+	/* trinet */
 	// Execute DELETE on objectName.
 	resp, err := c.executeMethod(ctx, http.MethodDelete, requestMetadata{
 		bucketName:       bucketName,

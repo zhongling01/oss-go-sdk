@@ -5,5 +5,8 @@ const (
 	PortDefault            = "19000"
 	AccessKeyIDDefault     = "minioadmin"
 	SecretAccessKeyDefault = "minioadmin"
-	RegionDefault          = "us-east-1"
+	//AccessKeyIDDefault     = "trinetadmin"
+	//SecretAccessKeyDefault = "trinet123456"
+
+	RegionDefault = "us-east-1"
 )
