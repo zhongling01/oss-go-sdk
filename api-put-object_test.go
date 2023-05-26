@@ -343,4 +343,36 @@ func TestPreferredEnginePool(t *testing.T) {
 	// TODO: 测试decommissioning
 }
 
+// 测试 DisableContentSha256 opts
+func TestPutOptsDisableContentSha256(t *testing.T) {
+	opts := &Options{
+		Creds: credentials.NewStaticV4(AccessKeyIDDefault, SecretAccessKeyDefault, ""),
+	}
+	client, err := New(EndpointDefault, opts)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	bucket := "test-putopts"
+	object := "test-obj"
+	err = client.MakeBucket(context.Background(), bucket, MakeBucketOptions{ForceCreate: true})
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	defer client.RemoveBucketWithOptions(context.Background(), bucket, RemoveBucketOptions{ForceDelete: true})
+
+	data := "test"
+	size := int64(len(data))
+
+	_, err = client.PutObject(context.Background(), bucket, object, strings.NewReader(data), size,
+		PutObjectOptions{DisableContentSha256: true})
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	err = client.RemoveObject(context.Background(), bucket, object, RemoveObjectOptions{})
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+}
+
 /* trinet */
