@@ -75,8 +75,6 @@ const (
 	DefaultEngine ErasurePoolEngine = ""
 	HDD           ErasurePoolEngine = "HDD"
 	SSD           ErasurePoolEngine = "SSD"
-	//ElasticSearchHDD ErasurePoolEngine = "ElasticSearch+HDD"
-	//ElasticSearchSSD ErasurePoolEngine = "ElasticSearch+SSD"
 )
 
 /* trinet */
