@@ -109,6 +109,7 @@ const (
 	MinIOPartialUpdateMode       = "X-Minio-Partial-Update-Mode"
 	MinIOPartialUpdateOffset     = "X-Minio-Partial-Update-Offset"
 	AmzSnowballExtract           = "X-Amz-Meta-Snowball-Auto-Extract"
+	MinIOSnowballIgnoreDirs      = "X-Amz-Meta-Minio-Snowball-Ignore-Dirs"
 	MinIOMergeMultipart          = "X-Minio-Merge-Multipart"
 	MinIOPoolEngine              = "X-Minio-Pool-Engine"
 	MinIODelBucketParallelDrives = "X-Minio-Del-Bucket-Parallel-Drives"
