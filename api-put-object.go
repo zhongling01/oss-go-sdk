@@ -319,7 +319,7 @@ func (a completedParts) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a completedParts) Less(i, j int) bool { return a[i].PartNumber < a[j].PartNumber }
 
 /* trinet */
-func (c *Client) ExtractOnline(ctx context.Context, bucketName string, reader io.Reader, objectSize int64,
+func (c *Client) ExtractOnline(ctx context.Context, bucketName string, reader io.Reader, objectSize int64, ignoreDirs bool,
 ) (info UploadInfo, err error) {
 	if objectSize >= maxPartSize {
 		return UploadInfo{}, errors.New("ExtractOnline file is too large")
@@ -330,7 +330,7 @@ func (c *Client) ExtractOnline(ctx context.Context, bucketName string, reader io
 
 	opts := PutObjectOptions{
 		AmzSnowballExtract:      true,
-		MinIOSnowballIgnoreDirs: true,
+		MinIOSnowballIgnoreDirs: ignoreDirs,
 		PartSize:                maxPartSize,
 		DisableMultipart:        true,
 	}
