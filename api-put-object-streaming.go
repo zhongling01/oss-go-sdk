@@ -203,7 +203,8 @@ func (c *Client) putObjectMultipartStreamFromReadAt(ctx context.Context, bucketN
 				}
 
 				// Proceed to upload the part.
-				p := uploadPartParams{bucketName: bucketName,
+				p := uploadPartParams{
+					bucketName:   bucketName,
 					objectName:   objectName,
 					uploadID:     uploadID,
 					reader:       sectionReader,
@@ -244,7 +245,6 @@ func (c *Client) putObjectMultipartStreamFromReadAt(ctx context.Context, bucketN
 			return UploadInfo{}, ctx.Err()
 		case uploadRes := <-uploadedPartsCh:
 			if uploadRes.Error != nil {
-
 				return UploadInfo{}, uploadRes.Error
 			}
 
