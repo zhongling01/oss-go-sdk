@@ -20,8 +20,11 @@ package ossClient
 import (
 	"encoding/base64"
 	"fmt"
+	"net/http"
 	"strings"
 	"time"
+
+	"github.com/trinet2005/oss-go-sdk/pkg/encrypt"
 )
 
 // expirationDateFormat date format for expiration key in json policy.
@@ -256,6 +259,26 @@ func (p *PostPolicy) SetUserMetadata(key string, value string) error {
 	}
 	p.formData[headerName] = value
 	return nil
+}
+
+// SetChecksum sets the checksum of the request.
+func (p *PostPolicy) SetChecksum(c Checksum) {
+	if c.IsSet() {
+		p.formData[amzChecksumAlgo] = c.Type.String()
+		p.formData[c.Type.Key()] = c.Encoded()
+	}
+}
+
+// SetEncryption - sets encryption headers for POST API
+func (p *PostPolicy) SetEncryption(sse encrypt.ServerSide) {
+	if sse == nil {
+		return
+	}
+	h := http.Header{}
+	sse.Marshal(h)
+	for k, v := range h {
+		p.formData[k] = v[0]
+	}
 }
 
 // SetUserData - Set user data as a key/value couple.
