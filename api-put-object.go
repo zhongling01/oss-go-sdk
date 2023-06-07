@@ -107,11 +107,12 @@ type PutObjectOptions struct {
 	ConcurrentStreamParts bool
 
 	/* trinet */
-	MergeMultipart      bool              // merge all parts in CompleteMultipartUpload and trans to a normal object
-	PartialUpdateInfo   PartialUpdateInfo // partial update
-	AppendMode          bool              // append write, and PartialUpdateInfo parameters conflict
-	PreferredEnginePool ErasurePoolEngine // the user can choose which engine's pool to save data to
-	AmzSnowballExtract  bool
+	MergeMultipart          bool              // merge all parts in CompleteMultipartUpload and trans to a normal object
+	PartialUpdateInfo       PartialUpdateInfo // partial update
+	AppendMode              bool              // append write, and PartialUpdateInfo parameters conflict
+	PreferredEnginePool     ErasurePoolEngine // the user can choose which engine's pool to save data to
+	AmzSnowballExtract      bool              // online extract
+	MinIOSnowballIgnoreDirs bool              // ignore dirs when extract upload
 	/* trinet */
 
 	Internal AdvancedPutOptions
@@ -245,6 +246,9 @@ func (opts PutObjectOptions) Header() (header http.Header) {
 	if opts.AmzSnowballExtract {
 		header.Set(AmzSnowballExtract, "true")
 	}
+	if opts.MinIOSnowballIgnoreDirs {
+		header.Set(MinIOSnowballIgnoreDirs, "true")
+	}
 	if opts.MergeMultipart {
 		header.Set(MinIOMergeMultipart, "true")
 	}
@@ -323,9 +327,10 @@ func (c *Client) ExtractOnline(ctx context.Context, bucketName string, reader io
 	}
 
 	opts := PutObjectOptions{
-		AmzSnowballExtract: true,
-		PartSize:           maxPartSize,
-		DisableMultipart:   true,
+		AmzSnowballExtract:      true,
+		MinIOSnowballIgnoreDirs: true,
+		PartSize:                maxPartSize,
+		DisableMultipart:        true,
 	}
 	objectName := "extractfile"
 	return c.PutObject(ctx, bucketName, objectName, reader, objectSize, opts)
