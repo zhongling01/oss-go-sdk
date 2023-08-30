@@ -19,12 +19,17 @@ package ossClient
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"github.com/trinet2005/oss-go-sdk/pkg/credentials"
 	"io"
+	"net/http"
+	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/trinet2005/oss-go-sdk/pkg/encrypt"
 )
 
 func TestPutObjectOptionsValidate(t *testing.T) {
@@ -66,6 +71,105 @@ func TestPutObjectOptionsValidate(t *testing.T) {
 		if testCase.shouldPass && err != nil {
 			t.Errorf("Test %d - output did not match with reference results, %s", i+1, err)
 		}
+	}
+}
+
+type InterceptRouteTripper struct {
+	request *http.Request
+}
+
+func (i *InterceptRouteTripper) RoundTrip(request *http.Request) (*http.Response, error) {
+	i.request = request
+	return &http.Response{StatusCode: 200}, nil
+}
+
+func Test_SSEHeaders(t *testing.T) {
+	rt := &InterceptRouteTripper{}
+	c, err := New("s3.amazonaws.com", &Options{
+		Transport: rt,
+	})
+	if err != nil {
+		t.Error(err)
+	}
+
+	testCases := map[string]struct {
+		sse                            func() encrypt.ServerSide
+		initiateMultipartUploadHeaders http.Header
+		headerNotAllowedAfterInit      []string
+	}{
+		"noEncryption": {
+			sse:                            func() encrypt.ServerSide { return nil },
+			initiateMultipartUploadHeaders: http.Header{},
+		},
+		"sse": {
+			sse: func() encrypt.ServerSide {
+				s, err := encrypt.NewSSEKMS("keyId", nil)
+				if err != nil {
+					t.Error(err)
+				}
+				return s
+			},
+			initiateMultipartUploadHeaders: http.Header{
+				encrypt.SseGenericHeader: []string{"aws:kms"},
+				encrypt.SseKmsKeyID:      []string{"keyId"},
+			},
+			headerNotAllowedAfterInit: []string{encrypt.SseGenericHeader, encrypt.SseKmsKeyID, encrypt.SseEncryptionContext},
+		},
+		"sse with context": {
+			sse: func() encrypt.ServerSide {
+				s, err := encrypt.NewSSEKMS("keyId", "context")
+				if err != nil {
+					t.Error(err)
+				}
+				return s
+			},
+			initiateMultipartUploadHeaders: http.Header{
+				encrypt.SseGenericHeader:     []string{"aws:kms"},
+				encrypt.SseKmsKeyID:          []string{"keyId"},
+				encrypt.SseEncryptionContext: []string{base64.StdEncoding.EncodeToString([]byte("\"context\""))},
+			},
+			headerNotAllowedAfterInit: []string{encrypt.SseGenericHeader, encrypt.SseKmsKeyID, encrypt.SseEncryptionContext},
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			opts := PutObjectOptions{
+				ServerSideEncryption: tc.sse(),
+			}
+			c.bucketLocCache.Set("test", "region")
+			c.initiateMultipartUpload(context.Background(), "test", "test", opts)
+			for s, vls := range tc.initiateMultipartUploadHeaders {
+				if !reflect.DeepEqual(rt.request.Header[s], vls) {
+					t.Errorf("Header %v are not equal, want: %v got %v", s, vls, rt.request.Header[s])
+				}
+			}
+
+			_, err := c.uploadPart(context.Background(), uploadPartParams{
+				bucketName: "test",
+				objectName: "test",
+				partNumber: 1,
+				uploadID:   "upId",
+				sse:        opts.ServerSideEncryption,
+			})
+			if err != nil {
+				t.Error(err)
+			}
+
+			for _, k := range tc.headerNotAllowedAfterInit {
+				if rt.request.Header.Get(k) != "" {
+					t.Errorf("header %v should not be set", k)
+				}
+			}
+
+			c.completeMultipartUpload(context.Background(), "test", "test", "upId", completeMultipartUpload{}, opts)
+
+			for _, k := range tc.headerNotAllowedAfterInit {
+				if rt.request.Header.Get(k) != "" {
+					t.Errorf("header %v should not be set", k)
+				}
+			}
+		})
 	}
 }
 
@@ -370,6 +474,48 @@ func TestPutOptsDisableContentSha256(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 	err = client.RemoveObject(context.Background(), bucket, object, RemoveObjectOptions{})
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+}
+
+// 测试写子目录
+func TestSubDir(t *testing.T) {
+	opts := &Options{
+		Creds: credentials.NewStaticV4(AccessKeyIDDefault, SecretAccessKeyDefault, ""),
+	}
+	client, err := New(EndpointDefault, opts)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	bucket := "test-sub-dir"
+	err = client.MakeBucket(context.Background(), bucket, MakeBucketOptions{ForceCreate: true})
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	defer client.RemoveBucketWithOptions(context.Background(), bucket, RemoveBucketOptions{ForceDelete: true})
+
+	data := "test"
+	size := int64(len(data))
+	obj := "1/"
+	_, err = client.PutObject(context.Background(), bucket, obj, strings.NewReader(data), size, PutObjectOptions{})
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	obj = "1/2"
+	_, err = client.PutObject(context.Background(), bucket, obj, strings.NewReader(data), size, PutObjectOptions{})
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	obj = "1/2/3"
+	_, err = client.PutObject(context.Background(), bucket, obj, strings.NewReader(data), size, PutObjectOptions{})
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	obj = "4/5/6/7"
+	_, err = client.PutObject(context.Background(), bucket, obj, strings.NewReader(data), size, PutObjectOptions{})
 	if err != nil {
 		t.Fatal(err.Error())
 	}

@@ -57,14 +57,15 @@ func (r ReplicationStatus) Empty() bool {
 // AdvancedPutOptions for internal use - to be utilized by replication, ILM transition
 // implementation on MinIO server
 type AdvancedPutOptions struct {
-	SourceVersionID    string
-	SourceETag         string
-	ReplicationStatus  ReplicationStatus
-	SourceMTime        time.Time
-	ReplicationRequest bool
-	RetentionTimestamp time.Time
-	TaggingTimestamp   time.Time
-	LegalholdTimestamp time.Time
+	SourceVersionID          string
+	SourceETag               string
+	ReplicationStatus        ReplicationStatus
+	SourceMTime              time.Time
+	ReplicationRequest       bool
+	RetentionTimestamp       time.Time
+	TaggingTimestamp         time.Time
+	LegalholdTimestamp       time.Time
+	ReplicationValidityCheck bool
 }
 
 /* trinet: the user can choose which engine's pool to save data to */
@@ -223,6 +224,9 @@ func (opts PutObjectOptions) Header() (header http.Header) {
 	}
 	if opts.Internal.ReplicationRequest {
 		header.Set(minIOBucketReplicationRequest, "true")
+	}
+	if opts.Internal.ReplicationValidityCheck {
+		header.Set(minIOBucketReplicationCheck, "true")
 	}
 	if !opts.Internal.LegalholdTimestamp.IsZero() {
 		header.Set(minIOBucketReplicationObjectLegalHoldTimestamp, opts.Internal.LegalholdTimestamp.Format(time.RFC3339Nano))
