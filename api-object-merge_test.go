@@ -13,6 +13,8 @@ import (
 	"time"
 )
 
+const TestVacancyThreshold = 80
+
 // RandomStr 随机生成字符串
 func RandomStr(length int) string {
 	str := "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+{}|:<>;."
@@ -210,7 +212,7 @@ func TestClient_Vacancy(t *testing.T) {
 			t.Fatal(err)
 		}
 		meta, err = client.GetObjectIndexInfo(context.Background(), id, bucket)
-		if meta.VacancySize*100/meta.TotalSize > 66 || deleteIdx == fileNum-2 {
+		if meta.VacancySize*100/meta.TotalSize > TestVacancyThreshold || deleteIdx == fileNum-2 {
 			deleteIdx = i
 			break
 		}
@@ -220,6 +222,13 @@ func TestClient_Vacancy(t *testing.T) {
 	adminClient, err := madmin.New(EndpointDefault, AccessKeyIDDefault, SecretAccessKeyDefault, false)
 	if err != nil {
 		t.Fatal(err)
+	}
+	vacancyInfo, err := adminClient.GetVacancyInfo(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !vacancyInfo.Enabled || vacancyInfo.VacancyThreshold > TestVacancyThreshold {
+		t.Fatal("please enable hole recovery function and set minio VacancyThreshold > TestVacancyThreshold")
 	}
 	err = adminClient.ManualMergeVacancy(context.Background())
 	if err != nil {
