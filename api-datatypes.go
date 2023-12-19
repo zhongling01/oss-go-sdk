@@ -220,6 +220,11 @@ type ObjectInfo struct {
 	ExpirationRuleID string
 
 	Restore *RestoreInfo
+	/*trinet*/
+	TransitionedObjName string
+	TransitionTier      string
+	TransitionStatus    string
+	/*trinet*/
 
 	// Checksum values
 	ChecksumCRC32  string

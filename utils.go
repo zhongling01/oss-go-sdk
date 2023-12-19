@@ -377,7 +377,12 @@ func ToObjectInfo(bucketName, objectName string, h http.Header) (ObjectInfo, err
 		UserTags:     userTags,
 		UserTagCount: tagCount,
 		Restore:      restore,
-
+		/*trinet*/
+		TransitionedObjName: h.Get("x-amz-Transitioned-Obj-Name"),
+		TransitionTier:      h.Get("x-amz-Transitioned-Obj-Tier"),
+		TransitionStatus:    h.Get("x-amz-Transitioned-Obj-Status"),
+		/*trinet*/
+		
 		// Checksum values
 		ChecksumCRC32:  h.Get("x-amz-checksum-crc32"),
 		ChecksumCRC32C: h.Get("x-amz-checksum-crc32c"),
