@@ -19,6 +19,7 @@ package ossClient
 
 import (
 	"context"
+	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"net/http"
@@ -27,6 +28,72 @@ import (
 
 	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
 )
+
+/* trinet */
+type SimpleBucketInfo struct {
+	Name             string    `json:"name"`
+	Size             uint64    `json:"size"`
+	ObjectsCount     uint64    `json:"objectsCount"`
+	CreationDate     time.Time `json:"creationDate"`
+	VersioningStatus string    `json:"versioningStatus"`
+	RecycleEnabled   bool      `json:"recycleEnabled"`
+}
+
+/* trinet */
+
+// ListBuckets list all buckets owned by this authenticated user.
+//
+// This call requires explicit authentication, no anonymous requests are
+// allowed for listing buckets.
+//
+//	api := client.New(....)
+//	for message := range api.ListBuckets(context.Background()) {
+//	    fmt.Println(message)
+//	}
+/* trinet */
+func (c *Client) TriListBuckets(ctx context.Context, listRecycle bool) ( /* []BucketInfo */ []SimpleBucketInfo, error) {
+	// Execute GET on service.
+	var customHeader http.Header
+	if listRecycle {
+		headers := make(http.Header)
+		headers.Add("X-Minio-List-Recycle-Bucket", "true")
+		customHeader = headers
+	}
+
+	urlValues := make(url.Values)
+	urlValues.Set("trilistbuckets", "true")
+
+	resp, err := c.executeMethod(ctx, http.MethodGet, requestMetadata{
+		contentSHA256Hex: emptySHA256Hex,
+		customHeader:     customHeader,
+		queryValues:      urlValues,
+	})
+	/* trinet */
+
+	defer closeResponse(resp)
+	if err != nil {
+		return nil, err
+	}
+	if resp != nil {
+		if resp.StatusCode != http.StatusOK {
+			return nil, httpRespToErrorResponse(resp, "", "")
+		}
+	}
+	/* trinet 改为json化传递提速*/
+	//listAllMyBucketsResult := listAllMyBucketsResult{}
+	//err = xmlDecoder(resp.Body, &listAllMyBucketsResult)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//return listAllMyBucketsResult.Buckets.Bucket, nil
+
+	var bucketsInfo []SimpleBucketInfo
+	if err = json.NewDecoder(resp.Body).Decode(&bucketsInfo); err != nil {
+		return nil, err
+	}
+	return bucketsInfo, nil
+	/* trinet */
+}
 
 // ListBuckets list all buckets owned by this authenticated user.
 //
