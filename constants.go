@@ -116,5 +116,5 @@ const (
 	MinIOPoolEngine              = "X-Minio-Pool-Engine"
 	MinIODelBucketParallelDrives = "X-Minio-Del-Bucket-Parallel-Drives"
 	MinIODelPrefixParallelDrives = "X-Minio-Del-Prefix-Parallel-Drives"
-	/* trinet */
+	MinIOSnowballUpdateMTime     = "X-Amz-Meta-Minio-Snowball-Update-MTime" /* trinet */
 )
