@@ -108,12 +108,13 @@ type PutObjectOptions struct {
 	ConcurrentStreamParts bool
 
 	/* trinet */
-	MergeMultipart          bool              // merge all parts in CompleteMultipartUpload and trans to a normal object
-	PartialUpdateInfo       PartialUpdateInfo // partial update
-	AppendMode              bool              // append write, and PartialUpdateInfo parameters conflict
-	PreferredEnginePool     ErasurePoolEngine // the user can choose which engine's pool to save data to
-	AmzSnowballExtract      bool              // online extract
-	MinIOSnowballIgnoreDirs bool              // ignore dirs when extract upload
+	MergeMultipart           bool              // merge all parts in CompleteMultipartUpload and trans to a normal object
+	PartialUpdateInfo        PartialUpdateInfo // partial update
+	AppendMode               bool              // append write, and PartialUpdateInfo parameters conflict
+	PreferredEnginePool      ErasurePoolEngine // the user can choose which engine's pool to save data to
+	AmzSnowballExtract       bool              // online extract
+	MinIOSnowballIgnoreDirs  bool              // ignore dirs when extract upload
+	MinIOSnowballUpdateMTime bool              // update mtime when extract upload
 	/* trinet */
 
 	Internal AdvancedPutOptions
@@ -259,6 +260,9 @@ func (opts PutObjectOptions) Header() (header http.Header) {
 	if opts.PreferredEnginePool != "" {
 		header.Set(MinIOPoolEngine, string(opts.PreferredEnginePool))
 	}
+	if opts.MinIOSnowballUpdateMTime {
+		header.Set(MinIOSnowballUpdateMTime, "true")
+	}
 	/* trinet */
 
 	if len(opts.UserTags) != 0 {
@@ -321,7 +325,7 @@ func (a completedParts) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a completedParts) Less(i, j int) bool { return a[i].PartNumber < a[j].PartNumber }
 
 /* trinet */
-func (c *Client) ExtractOnline(ctx context.Context, bucketName string, reader io.Reader, objectSize int64, ignoreDirs bool,
+func (c *Client) ExtractOnline(ctx context.Context, bucketName string, reader io.Reader, objectSize int64, ignoreDirs bool, UpdateMTime bool,
 ) (info UploadInfo, err error) {
 	if objectSize >= maxPartSize {
 		return UploadInfo{}, errors.New("ExtractOnline file is too large")
@@ -331,10 +335,11 @@ func (c *Client) ExtractOnline(ctx context.Context, bucketName string, reader io
 	}
 
 	opts := PutObjectOptions{
-		AmzSnowballExtract:      true,
-		MinIOSnowballIgnoreDirs: ignoreDirs,
-		PartSize:                maxPartSize,
-		DisableMultipart:        true,
+		AmzSnowballExtract:       true,
+		MinIOSnowballIgnoreDirs:  ignoreDirs,
+		PartSize:                 maxPartSize,
+		DisableMultipart:         true,
+		MinIOSnowballUpdateMTime: UpdateMTime,
 	}
 	objectName := "extractfile"
 	return c.PutObject(ctx, bucketName, objectName, reader, objectSize, opts)
