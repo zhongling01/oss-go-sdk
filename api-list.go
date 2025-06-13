@@ -18,10 +18,12 @@
 package ossClient
 
 import (
+	"compress/gzip"
 	"context"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"time"
@@ -51,7 +53,7 @@ type SimpleBucketInfo struct {
 //	    fmt.Println(message)
 //	}
 /* trinet */
-func (c *Client) TriListBuckets(ctx context.Context, listRecycle bool) ( /* []BucketInfo */ []SimpleBucketInfo, error) {
+func (c *Client) TriListBuckets(ctx context.Context, listRecycle bool) ([]SimpleBucketInfo, error) {
 	// Execute GET on service.
 	var customHeader http.Header
 	if listRecycle {
@@ -59,6 +61,10 @@ func (c *Client) TriListBuckets(ctx context.Context, listRecycle bool) ( /* []Bu
 		headers.Add("X-Minio-List-Recycle-Bucket", "true")
 		customHeader = headers
 	}
+	if customHeader == nil {
+		customHeader = make(http.Header)
+	}
+	customHeader.Add("Accept-Encoding", "gzip")
 
 	urlValues := make(url.Values)
 	urlValues.Set("trilistbuckets", "true")
@@ -68,7 +74,6 @@ func (c *Client) TriListBuckets(ctx context.Context, listRecycle bool) ( /* []Bu
 		customHeader:     customHeader,
 		queryValues:      urlValues,
 	})
-	/* trinet */
 
 	defer closeResponse(resp)
 	if err != nil {
@@ -79,20 +84,29 @@ func (c *Client) TriListBuckets(ctx context.Context, listRecycle bool) ( /* []Bu
 			return nil, httpRespToErrorResponse(resp, "", "")
 		}
 	}
-	/* trinet 改为json化传递提速*/
-	//listAllMyBucketsResult := listAllMyBucketsResult{}
-	//err = xmlDecoder(resp.Body, &listAllMyBucketsResult)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//return listAllMyBucketsResult.Buckets.Bucket, nil
+
+	// 检查响应是否是 gzip 压缩的
+	var reader io.Reader = resp.Body
+	if resp.Header.Get("Content-Encoding") == "gzip" {
+		gzReader, err := gzip.NewReader(resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("创建 gzip reader 失败: %v", err)
+		}
+		defer gzReader.Close()
+		reader = gzReader
+
+		var bucketsInfo []SimpleBucketInfo
+		if err = json.NewDecoder(reader).Decode(&bucketsInfo); err != nil {
+			return nil, err
+		}
+		return bucketsInfo, nil
+	}
 
 	var bucketsInfo []SimpleBucketInfo
 	if err = json.NewDecoder(resp.Body).Decode(&bucketsInfo); err != nil {
 		return nil, err
 	}
 	return bucketsInfo, nil
-	/* trinet */
 }
 
 // ListBuckets list all buckets owned by this authenticated user.
