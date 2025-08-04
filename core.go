@@ -52,7 +52,9 @@ func (c Core) ListObjects(bucket, prefix, marker, delimiter string, maxKeys int)
 // ListObjectsV2 - Lists all the objects at a prefix, similar to ListObjects() but uses
 // continuationToken instead of marker to support iteration over the results.
 func (c Core) ListObjectsV2(bucketName, objectPrefix, startAfter, continuationToken, delimiter string, maxkeys int) (ListBucketV2Result, error) {
-	return c.listObjectsV2Query(context.Background(), bucketName, objectPrefix, continuationToken, true, false, delimiter, startAfter, maxkeys, nil)
+	/* trinet 添加分页模式 */
+	return c.listObjectsV2Query(context.Background(), bucketName, objectPrefix, continuationToken, true, false, delimiter, startAfter, maxkeys, 0, false, nil)
+	/* trinet 添加分页模式 */
 }
 
 // CopyObject - copies an object from source object to destination object on server side.

@@ -204,9 +204,11 @@ func (c *Client) listObjectsV2(ctx context.Context, bucketName string, opts List
 		// Save continuationToken for next request.
 		var continuationToken string
 		for {
+			/* trinet 添加分页模式 */
 			// Get list of objects a maximum of 1000 per request.
 			result, err := c.listObjectsV2Query(ctx, bucketName, opts.Prefix, continuationToken,
-				fetchOwner, opts.WithMetadata, delimiter, opts.StartAfter, opts.MaxKeys, opts.headers)
+				fetchOwner, opts.WithMetadata, delimiter, opts.StartAfter, opts.MaxKeys, opts.Skip, opts.IsPagination, opts.headers)
+			/* trinet 添加分页模式 */
 			if err != nil {
 				sendObjectInfo(ObjectInfo{
 					Err: err,
@@ -242,7 +244,12 @@ func (c *Client) listObjectsV2(ctx context.Context, bucketName string, opts List
 			if result.NextContinuationToken != "" {
 				continuationToken = result.NextContinuationToken
 			}
-
+			/* trinet 添加分页模式 */
+			//if isPagination is true, and result is truncated, return. just return the page result.
+			if opts.IsPagination && result.IsTruncated {
+				return
+			}
+			/* trinet 添加分页模式 */
 			// Listing ends result is not truncated, return right here.
 			if !result.IsTruncated {
 				return
@@ -271,7 +278,9 @@ func (c *Client) listObjectsV2(ctx context.Context, bucketName string, opts List
 // ?delimiter - A delimiter is a character you use to group keys.
 // ?start-after - Sets a marker to start listing lexically at this key onwards.
 // ?max-keys - Sets the maximum number of keys returned in the response body.
-func (c *Client) listObjectsV2Query(ctx context.Context, bucketName, objectPrefix, continuationToken string, fetchOwner, metadata bool, delimiter, startAfter string, maxkeys int, headers http.Header) (ListBucketV2Result, error) {
+/* trinet 添加分页模式 */
+func (c *Client) listObjectsV2Query(ctx context.Context, bucketName, objectPrefix, continuationToken string, fetchOwner, metadata bool, delimiter, startAfter string, maxkeys int, skip int, isPagination bool, headers http.Header) (ListBucketV2Result, error) {
+	/* trinet 添加分页模式 */
 	// Validate bucket name.
 	if err := s3utils.CheckValidBucketName(bucketName); err != nil {
 		return ListBucketV2Result{}, err
@@ -319,6 +328,15 @@ func (c *Client) listObjectsV2Query(ctx context.Context, bucketName, objectPrefi
 	if maxkeys > 0 {
 		urlValues.Set("max-keys", fmt.Sprintf("%d", maxkeys))
 	}
+
+	/* trinet 添加分页模式 */
+	if skip > 0 {
+		urlValues.Set("fos-skip", fmt.Sprintf("%d", skip))
+	}
+	if isPagination {
+		urlValues.Set("fos-pagination-mode", "true")
+	}
+	/* trinet 添加分页模式 */
 
 	// Execute GET on bucket to list objects.
 	resp, err := c.executeMethod(ctx, http.MethodGet, requestMetadata{
@@ -798,6 +816,12 @@ type ListObjectsOptions struct {
 	// Use the deprecated list objects V1 API
 	UseV1 bool
 
+	/* trinet 添加分页模式 */
+	// Skip the first n objects [fos-skip]
+	Skip int
+	// IsPagination is true if the list objects is pagination
+	IsPagination bool
+	/* trinet 添加分页模式 */
 	headers http.Header
 }
 
