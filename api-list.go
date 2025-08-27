@@ -151,6 +151,147 @@ func (c *Client) ListBuckets(ctx context.Context, listRecycle bool) ([]BucketInf
 	return listAllMyBucketsResult.Buckets.Bucket, nil
 }
 
+/* trinet */
+
+// ObjectCountResult holds the result of a count objects request
+type ObjectCountResult struct {
+	XMLName xml.Name `xml:"ObjectCountResult"`
+	Bucket  string   `xml:"Bucket"`
+	Prefix  string   `xml:"Prefix"`
+	Count   int64    `xml:"Count"`
+}
+
+// CountObjectsOptions holds all options of a count objects request
+// These options should match the filtering behavior of ListObjects to ensure
+// accurate count results for pagination scenarios
+type CountObjectsOptions struct {
+	// Include objects versions in the counting
+	WithVersions bool
+	// Only count objects with the prefix
+	Prefix string
+	// Ignore '/' delimiter (recursive counting)
+	Recursive bool
+	// The delimiter to be used to roll up objects (directory mode)
+	Delimiter string
+	// Include delete markers in the count
+	InclDeleted bool
+	// Include pure directories in the count (automatically determined by server based on delimiter)
+	// Note: This field is kept for API compatibility but behavior is controlled by Delimiter/Recursive
+	IncludeDirectories bool
+	// StartAfter start counting lexically at this object onwards
+	StartAfter string
+	// Use the deprecated list objects V1 API behavior for counting
+	UseV1 bool
+
+	headers http.Header
+}
+
+// Set adds a key value pair to the options. The
+// key-value pair will be part of the HTTP GET request
+// headers.
+func (o *CountObjectsOptions) Set(key, value string) {
+	if o.headers == nil {
+		o.headers = make(http.Header)
+	}
+	o.headers.Set(key, value)
+}
+
+// CountObjects returns the total count of objects in a bucket that match the specified prefix.
+// This is useful for pagination scenarios where the total count is needed before listing.
+// Unlike ListObjects, this API only returns the count and does not read object metadata.
+//
+//	api := client.New(....)
+//	count, err := api.CountObjects(ctx, "mytestbucket", minio.CountObjectsOptions{Prefix: "photos/"})
+//	if err != nil {
+//	    log.Fatal(err)
+//	}
+//	fmt.Printf("Total objects: %d\n", count)
+func (c *Client) CountObjects(ctx context.Context, bucketName string, opts CountObjectsOptions) (int64, error) {
+	// Input validation.
+	if err := s3utils.CheckValidBucketName(bucketName); err != nil {
+		return 0, err
+	}
+
+	// Set up query parameters
+	urlValues := make(url.Values)
+	urlValues.Set("count", "")
+
+	if opts.Prefix != "" {
+		urlValues.Set("prefix", opts.Prefix)
+	}
+
+	if opts.Delimiter != "" {
+		urlValues.Set("delimiter", opts.Delimiter)
+	}
+
+	if opts.StartAfter != "" {
+		if opts.UseV1 {
+			urlValues.Set("marker", opts.StartAfter)
+		} else {
+			urlValues.Set("start-after", opts.StartAfter)
+		}
+	}
+
+	if opts.WithVersions {
+		urlValues.Set("versions", "")
+	}
+
+	if opts.InclDeleted {
+		urlValues.Set("include-delete-markers", "true")
+	}
+
+	// Handle delimiter and recursive exactly like original ListObjects
+	// 完全模仿原始 ListObjects 的递归控制逻辑
+	delimiter := opts.Delimiter
+	if delimiter == "" {
+		delimiter = "/" // Default delimiter like original ListObjects
+	}
+	if opts.Recursive {
+		// If recursive we do not delimit, just like original ListObjects
+		delimiter = ""
+	}
+
+	// Set the computed delimiter (empty string for recursive, "/" for non-recursive)
+	if delimiter != "" {
+		urlValues.Set("delimiter", delimiter)
+	}
+
+	// Note: We don't send separate "recursive" or "include-directories" parameters
+	// All behavior is controlled by delimiter presence/absence, just like ListObjects
+	// IncludeDirectories behavior is determined by server-side logic based on delimiter
+
+	if opts.UseV1 {
+		urlValues.Set("use-v1", "true")
+	}
+
+	// Execute GET request for object count
+	resp, err := c.executeMethod(ctx, http.MethodGet, requestMetadata{
+		bucketName:       bucketName,
+		contentSHA256Hex: emptySHA256Hex,
+		queryValues:      urlValues,
+	})
+	defer closeResponse(resp)
+	if err != nil {
+		return 0, err
+	}
+
+	if resp != nil {
+		if resp.StatusCode != http.StatusOK {
+			return 0, httpRespToErrorResponse(resp, bucketName, "")
+		}
+	}
+
+	// Parse the XML response
+	result := &ObjectCountResult{}
+	if err = xml.NewDecoder(resp.Body).Decode(result); err != nil {
+		return 0, err
+	}
+
+	return result.Count, nil
+}
+
+/* trinet */
+
 // Bucket List Operations.
 func (c *Client) listObjectsV2(ctx context.Context, bucketName string, opts ListObjectsOptions) <-chan ObjectInfo {
 	// Allocate new list objects channel.
@@ -279,7 +420,8 @@ func (c *Client) listObjectsV2(ctx context.Context, bucketName string, opts List
 // ?start-after - Sets a marker to start listing lexically at this key onwards.
 // ?max-keys - Sets the maximum number of keys returned in the response body.
 /* trinet 添加分页模式 */
-func (c *Client) listObjectsV2Query(ctx context.Context, bucketName, objectPrefix, continuationToken string, fetchOwner, metadata bool, delimiter, startAfter string, maxkeys int, skip int, isPagination bool, headers http.Header) (ListBucketV2Result, error) {
+func (c *Client) listObjectsV2Query(ctx context.Context, bucketName, objectPrefix, continuationToken string, fetchOwner,
+	metadata bool, delimiter, startAfter string, maxkeys int, skip int, isPagination bool, headers http.Header) (ListBucketV2Result, error) {
 	/* trinet 添加分页模式 */
 	// Validate bucket name.
 	if err := s3utils.CheckValidBucketName(bucketName); err != nil {
