@@ -32,6 +32,8 @@ type BucketInfo struct {
 	Name string `json:"name"`
 	// Date the bucket was created.
 	CreationDate time.Time `json:"creationDate"`
+	// BucketRegion region where the bucket is present
+	BucketRegion string `json:"bucketRegion"`
 	/* trinet */
 	RecycleEnabled    bool   `json:"recycleEnabled"`
 	Size              uint64 `json:"size"`
@@ -150,10 +152,12 @@ type UploadInfo struct {
 	// Verified checksum values, if any.
 	// Values are base64 (standard) encoded.
 	// For multipart objects this is a checksum of the checksum of each part.
-	ChecksumCRC32  string
-	ChecksumCRC32C string
-	ChecksumSHA1   string
-	ChecksumSHA256 string
+	ChecksumCRC32     string
+	ChecksumCRC32C    string
+	ChecksumSHA1      string
+	ChecksumSHA256    string
+	ChecksumCRC64NVME string
+	ChecksumMode      string
 }
 
 // RestoreInfo contains information of the restore operation of an archived object
@@ -218,6 +222,8 @@ type ObjectInfo struct {
 	// not to be confused with `Expires` HTTP header.
 	Expiration       time.Time
 	ExpirationRuleID string
+	// NumVersions is the number of versions of the object.
+	NumVersions int
 
 	Restore *RestoreInfo
 	/*trinet*/
@@ -227,10 +233,12 @@ type ObjectInfo struct {
 	/*trinet*/
 
 	// Checksum values
-	ChecksumCRC32  string
-	ChecksumCRC32C string
-	ChecksumSHA1   string
-	ChecksumSHA256 string
+	ChecksumCRC32     string
+	ChecksumCRC32C    string
+	ChecksumSHA1      string
+	ChecksumSHA256    string
+	ChecksumCRC64NVME string
+	ChecksumMode      string
 
 	Internal *struct {
 		K int // Data blocks

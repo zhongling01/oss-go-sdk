@@ -18,12 +18,12 @@
 package policy
 
 import (
-	"encoding/json"
 	"fmt"
 	"reflect"
 	"testing"
 
-	"github.com/trinet2005/oss-go-sdk/pkg/set"
+	"github.com/minio/minio-go/v7/internal/json"
+	"github.com/minio/minio-go/v7/pkg/set"
 )
 
 // TestUnmarshalBucketPolicy tests unmarsheling various examples
@@ -211,6 +211,51 @@ func TestUnmarshalBucketPolicy(t *testing.T) {
     }
   ]
 }`, shouldSucceed: true},
+		// Test 10
+		{policyData: `{
+	"Version": "2012-10-17",
+	"Statement": [{
+		"Effect": "Deny",
+		"Principal": {
+			"AWS": [
+				"*"
+			]
+		},
+		"Action": [
+			"s3:PutObject"
+		],
+		"Resource": [
+			"arn:aws:s3:::mytest/*"
+		],
+		"Condition": {
+			"Null": {
+				"s3:x-amz-server-side-encryption": [
+					true
+				]
+			}
+		}
+	}]
+}`, shouldSucceed: true},
+		// Test 11
+		{policyData: `{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Deny",
+            "Principal": "*",
+            "Action": "s3:PutObject",
+            "Resource": [
+                "arn:aws:s3:::DOC-EXAMPLE-BUCKET1",
+                "arn:aws:s3:::DOC-EXAMPLE-BUCKET1/*"
+            ],
+            "Condition": {
+                "NumericLessThan": {
+                    "s3:TlsVersion": 1.2
+                }
+            }
+        }
+    ]
+}`, shouldSucceed: true},
 	}
 
 	for i, testCase := range testCases {
@@ -331,7 +376,7 @@ func TestNewStatements(t *testing.T) {
 		// BucketPolicyReadOnly: with empty bucket name empty prefix.
 		{BucketPolicyReadOnly, "", "hello", `[]`},
 		// BucketPolicyReadOnly: with bucket name prefix.
-		{BucketPolicyReadOnly, "mybucket", "hello", `[{"Action":["s3:GetBucketLocation"],"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket"],"Sid":""},{"Action":["s3:ListBucket"],"Condition":{"StringEquals":{"s3:prefix":["hello"]}},"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket"],"Sid":""},{"Action":["s3:GetObject"],"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket/hello*"],"Sid":""}]`},
+		{BucketPolicyReadOnly, "mybucket", "hello", `[{"Action":["s3:GetBucketLocation"],"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket"],"Sid":""},{"Action":["s3:ListBucket"],"Condition":{"StringLike":{"s3:prefix":["hello*"]}},"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket"],"Sid":""},{"Action":["s3:GetObject"],"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket/hello*"],"Sid":""}]`},
 		// BucketPolicyReadWrite: with empty bucket name and prefix.
 		{BucketPolicyReadWrite, "", "", `[]`},
 		// BucketPolicyReadWrite: with bucket name and empty prefix.
@@ -339,7 +384,7 @@ func TestNewStatements(t *testing.T) {
 		// BucketPolicyReadWrite: with empty bucket name empty prefix.
 		{BucketPolicyReadWrite, "", "hello", `[]`},
 		// BucketPolicyReadWrite: with bucket name prefix.
-		{BucketPolicyReadWrite, "mybucket", "hello", `[{"Action":["s3:GetBucketLocation"],"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket"],"Sid":""},{"Action":["s3:ListBucket"],"Condition":{"StringEquals":{"s3:prefix":["hello"]}},"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket"],"Sid":""},{"Action":["s3:ListBucketMultipartUploads"],"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket"],"Sid":""},{"Action":["s3:AbortMultipartUpload","s3:DeleteObject","s3:GetObject","s3:ListMultipartUploadParts","s3:PutObject"],"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket/hello*"],"Sid":""}]`},
+		{BucketPolicyReadWrite, "mybucket", "hello", `[{"Action":["s3:GetBucketLocation"],"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket"],"Sid":""},{"Action":["s3:ListBucket"],"Condition":{"StringLike":{"s3:prefix":["hello*"]}},"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket"],"Sid":""},{"Action":["s3:ListBucketMultipartUploads"],"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket"],"Sid":""},{"Action":["s3:AbortMultipartUpload","s3:DeleteObject","s3:GetObject","s3:ListMultipartUploadParts","s3:PutObject"],"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket/hello*"],"Sid":""}]`},
 		// BucketPolicyWriteOnly: with empty bucket name and prefix.
 		{BucketPolicyWriteOnly, "", "", `[]`},
 		// BucketPolicyWriteOnly: with bucket name and empty prefix.
@@ -495,7 +540,7 @@ func TestGetInUsePolicy(t *testing.T) {
 
 	for _, testCase := range testCases {
 		result1, result2 := getInUsePolicy(testCase.statements, testCase.bucketName, testCase.prefix)
-		if !(result1 == testCase.expectedResult1 && result2 == testCase.expectedResult2) {
+		if result1 != testCase.expectedResult1 || result2 != testCase.expectedResult2 {
 			t.Fatalf("%+v: expected: [%t,%t], got: [%t,%t]", testCase,
 				testCase.expectedResult1, testCase.expectedResult2,
 				result1, result2)
@@ -1507,7 +1552,7 @@ func TestGetBucketPolicy(t *testing.T) {
 
 	for _, testCase := range testCases {
 		commonFound, readOnly, writeOnly := getBucketPolicy(testCase.statement, testCase.prefix)
-		if !(testCase.expectedResult1 == commonFound && testCase.expectedResult2 == readOnly && testCase.expectedResult3 == writeOnly) {
+		if testCase.expectedResult1 != commonFound || testCase.expectedResult2 != readOnly || testCase.expectedResult3 != writeOnly {
 			t.Fatalf("%+v: expected: [%t,%t,%t], got: [%t,%t,%t]", testCase,
 				testCase.expectedResult1, testCase.expectedResult2, testCase.expectedResult3,
 				commonFound, readOnly, writeOnly)
@@ -1569,7 +1614,7 @@ func TestGetObjectPolicy(t *testing.T) {
 
 	for _, testCase := range testCases {
 		readOnly, writeOnly := getObjectPolicy(testCase.statement)
-		if !(testCase.expectedResult1 == readOnly && testCase.expectedResult2 == writeOnly) {
+		if testCase.expectedResult1 != readOnly || testCase.expectedResult2 != writeOnly {
 			t.Fatalf("%+v: expected: [%t,%t], got: [%t,%t]", testCase,
 				testCase.expectedResult1, testCase.expectedResult2,
 				readOnly, writeOnly)
@@ -1863,7 +1908,7 @@ func TestSetPolicy(t *testing.T) {
 		// BucketPolicyReadOnly - empty statements, bucket name and non-empty prefix.
 		{[]Statement{}, BucketPolicyReadOnly, "", "hello", `[]`},
 		// BucketPolicyReadOnly - empty statements, non-empty bucket name and non-empty prefix.
-		{[]Statement{}, BucketPolicyReadOnly, "mybucket", "hello", `[{"Action":["s3:GetBucketLocation"],"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket"],"Sid":""},{"Action":["s3:ListBucket"],"Condition":{"StringEquals":{"s3:prefix":["hello"]}},"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket"],"Sid":""},{"Action":["s3:GetObject"],"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket/hello*"],"Sid":""}]`},
+		{[]Statement{}, BucketPolicyReadOnly, "mybucket", "hello", `[{"Action":["s3:GetBucketLocation"],"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket"],"Sid":""},{"Action":["s3:ListBucket"],"Condition":{"StringLike":{"s3:prefix":["hello*"]}},"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket"],"Sid":""},{"Action":["s3:GetObject"],"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket/hello*"],"Sid":""}]`},
 		// BucketPolicyWriteOnly - empty statements, bucket name and prefix.
 		{[]Statement{}, BucketPolicyReadOnly, "", "", `[]`},
 		// BucketPolicyWriteOnly - non-empty statements, bucket name and prefix.
@@ -1893,7 +1938,7 @@ func TestSetPolicy(t *testing.T) {
 		// BucketPolicyReadWrite - empty statements, bucket name and non-empty prefix.
 		{[]Statement{}, BucketPolicyReadWrite, "", "hello", `[]`},
 		// BucketPolicyReadWrite - empty statements, non-empty bucket name and non-empty prefix.
-		{[]Statement{}, BucketPolicyReadWrite, "mybucket", "hello", `[{"Action":["s3:GetBucketLocation","s3:ListBucketMultipartUploads"],"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket"],"Sid":""},{"Action":["s3:ListBucket"],"Condition":{"StringEquals":{"s3:prefix":["hello"]}},"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket"],"Sid":""},{"Action":["s3:AbortMultipartUpload","s3:DeleteObject","s3:GetObject","s3:ListMultipartUploadParts","s3:PutObject"],"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket/hello*"],"Sid":""}]`},
+		{[]Statement{}, BucketPolicyReadWrite, "mybucket", "hello", `[{"Action":["s3:GetBucketLocation","s3:ListBucketMultipartUploads"],"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket"],"Sid":""},{"Action":["s3:ListBucket"],"Condition":{"StringLike":{"s3:prefix":["hello*"]}},"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket"],"Sid":""},{"Action":["s3:AbortMultipartUpload","s3:DeleteObject","s3:GetObject","s3:ListMultipartUploadParts","s3:PutObject"],"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket/hello*"],"Sid":""}]`},
 		// Set readonly.
 		{[]Statement{{
 			Actions:   writeOnlyBucketActions,
@@ -1907,7 +1952,7 @@ func TestSetPolicy(t *testing.T) {
 			Effect:    "Allow",
 			Principal: User{AWS: set.CreateStringSet("*")},
 			Resources: set.CreateStringSet("arn:aws:s3:::mybucket"),
-		}}, BucketPolicyReadOnly, "mybucket", "hello", `[{"Action":["s3:GetBucketLocation"],"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket"],"Sid":""},{"Action":["s3:ListBucket"],"Condition":{"StringEquals":{"s3:prefix":["hello"]}},"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket"],"Sid":""},{"Action":["s3:GetObject"],"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket/hello*"],"Sid":""}]`},
+		}}, BucketPolicyReadOnly, "mybucket", "hello", `[{"Action":["s3:GetBucketLocation"],"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket"],"Sid":""},{"Action":["s3:ListBucket"],"Condition":{"StringLike":{"s3:prefix":["hello*"]}},"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket"],"Sid":""},{"Action":["s3:GetObject"],"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket/hello*"],"Sid":""}]`},
 		// Set writeonly.
 		{[]Statement{{
 			Actions:   readOnlyBucketActions,
@@ -1938,7 +1983,7 @@ func TestSetPolicy(t *testing.T) {
 			Principal:  User{AWS: set.CreateStringSet("*")},
 			Conditions: helloCondMap,
 			Resources:  set.CreateStringSet("arn:aws:s3:::mybucket"),
-		}}, BucketPolicyReadWrite, "mybucket", "hello", `[{"Action":["s3:GetBucketLocation","s3:ListBucketMultipartUploads"],"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket"],"Sid":""},{"Action":["s3:ListBucket"],"Condition":{"StringEquals":{"s3:prefix":["hello"]}},"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket"],"Sid":""},{"Action":["s3:AbortMultipartUpload","s3:DeleteObject","s3:GetObject","s3:ListMultipartUploadParts","s3:PutObject"],"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket/hello*"],"Sid":""}]`},
+		}}, BucketPolicyReadWrite, "mybucket", "hello", `[{"Action":["s3:GetBucketLocation","s3:ListBucketMultipartUploads"],"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket"],"Sid":""},{"Action":["s3:ListBucket"],"Condition":{"StringLike":{"s3:prefix":["hello*"]}},"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket"],"Sid":""},{"Action":["s3:AbortMultipartUpload","s3:DeleteObject","s3:GetObject","s3:ListMultipartUploadParts","s3:PutObject"],"Effect":"Allow","Principal":{"AWS":["*"]},"Resource":["arn:aws:s3:::mybucket/hello*"],"Sid":""}]`},
 	}
 
 	for _, testCase := range testCases {

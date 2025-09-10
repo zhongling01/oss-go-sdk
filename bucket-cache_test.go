@@ -28,25 +28,14 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/trinet2005/oss-go-sdk/pkg/credentials"
-	"github.com/trinet2005/oss-go-sdk/pkg/signer"
+	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/minio/minio-go/v7/pkg/kvcache"
+	"github.com/minio/minio-go/v7/pkg/signer"
 )
 
-// Test validates `newBucketLocationCache`.
-func TestNewBucketLocationCache(t *testing.T) {
-	expectedBucketLocationcache := &bucketLocationCache{
-		items: make(map[string]string),
-	}
-	actualBucketLocationCache := newBucketLocationCache()
-
-	if !reflect.DeepEqual(actualBucketLocationCache, expectedBucketLocationcache) {
-		t.Errorf("Unexpected return value")
-	}
-}
-
-// Tests validate bucketLocationCache operations.
+// Tests validate kvCache operations.
 func TestBucketLocationCacheOps(t *testing.T) {
-	testBucketLocationCache := newBucketLocationCache()
+	testBucketLocationCache := &kvcache.Cache[string, string]{}
 	expectedBucketName := "minio-bucket"
 	expectedLocation := "us-east-1"
 	testBucketLocationCache.Set(expectedBucketName, expectedLocation)
@@ -97,7 +86,7 @@ func TestGetBucketLocationRequest(t *testing.T) {
 		c.setUserAgent(req)
 
 		// Get credentials from the configured credentials provider.
-		value, err := c.credsProvider.Get()
+		value, err := c.credsProvider.GetWithContext(c.CredContext())
 		if err != nil {
 			return nil, err
 		}
@@ -302,7 +291,7 @@ func TestProcessBucketLocationResponse(t *testing.T) {
 
 	APIErrors := []APIError{
 		{
-			Code:           "AccessDenied",
+			Code:           AccessDenied,
 			Description:    "Access Denied",
 			HTTPStatusCode: http.StatusUnauthorized,
 		},

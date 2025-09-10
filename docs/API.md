@@ -60,27 +60,28 @@ func main() {
 
 | Bucket operations                                     | Object operations                                   | Presigned operations                          | Bucket Policy/Notification Operations                         | Client custom settings                                |
 | :---                                                  | :---                                                | :---                                          | :---                                                          | :---                                                  |
-| [`MakeBucket`](#MakeBucket)                           | [`GetObject`](#GetObject)                           | [`PresignedGetObject`](#PresignedGetObject)   | [`SetBucketPolicy`](#SetBucketPolicy)                         | [`SetAppInfo`](#SetAppInfo)                           |
-|                                                       | [`PutObject`](#PutObject)                           | [`PresignedPutObject`](#PresignedPutObject)   | [`GetBucketPolicy`](#GetBucketPolicy)                         |                                                       |
-| [`ListBuckets`](#ListBuckets)                         | [`CopyObject`](#CopyObject)                         | [`PresignedHeadObject`](#PresignedHeadObject) | [`SetBucketNotification`](#SetBucketNotification)             | [`TraceOn`](#TraceOn)                                 |
-| [`BucketExists`](#BucketExists)                       | [`StatObject`](#StatObject)                         | [`PresignedPostPolicy`](#PresignedPostPolicy) | [`GetBucketNotification`](#GetBucketNotification)             | [`TraceOff`](#TraceOff)                               |
-| [`RemoveBucket`](#RemoveBucket)                       | [`RemoveObject`](#RemoveObject)                     |                                               | [`RemoveAllBucketNotification`](#RemoveAllBucketNotification) | [`SetS3TransferAccelerate`](#SetS3TransferAccelerate) |
-| [`ListObjects`](#ListObjects)                         | [`RemoveObjects`](#RemoveObjects)                   |                                               | [`ListenBucketNotification`](#ListenBucketNotification)       |                                                       |
-|                                                       | [`RemoveIncompleteUpload`](#RemoveIncompleteUpload) |                                               | [`SetBucketLifecycle`](#SetBucketLifecycle)                   |                                                       |
-| [`ListIncompleteUploads`](#ListIncompleteUploads)     | [`FPutObject`](#FPutObject)                         |                                               | [`GetBucketLifecycle`](#GetBucketLifecycle)                   |                                                       |
-| [`SetBucketTagging`](#SetBucketTagging)               | [`FGetObject`](#FGetObject)                         |                                               | [`SetObjectLockConfig`](#SetObjectLockConfig)                 |                                                       |
-| [`GetBucketTagging`](#GetBucketTagging)               | [`ComposeObject`](#ComposeObject)                   |                                               | [`GetObjectLockConfig`](#GetObjectLockConfig)                 |                                                       |
-| [`RemoveBucketTagging`](#RemoveBucketTagging)         |                                                     |                                               | [`EnableVersioning`](#EnableVersioning)                       |                                                       |
+| [`MakeBucket`](#MakeBucket)                           | [`AppendObject`](#AppendObject)                           | [`PresignedGetObject`](#PresignedGetObject)   | [`SetBucketPolicy`](#SetBucketPolicy)                         | [`SetAppInfo`](#SetAppInfo)                           |
+|                                                       | [`GetObject`](#GetObject)                           | [`PresignedPutObject`](#PresignedPutObject)   | [`GetBucketPolicy`](#GetBucketPolicy)                         |                                                       |
+| [`ListBuckets`](#ListBuckets)                         | [`PutObject`](#PutObject)                         | [`PresignedHeadObject`](#PresignedHeadObject) | [`SetBucketNotification`](#SetBucketNotification)             | [`TraceOn`](#TraceOn)                                 |
+| [`BucketExists`](#BucketExists)                       | [`CopyObject`](#CopyObject)                         | [`PresignedPostPolicy`](#PresignedPostPolicy) | [`GetBucketNotification`](#GetBucketNotification)             | [`TraceOff`](#TraceOff)                               |
+| [`RemoveBucket`](#RemoveBucket)                       | [`StatObject`](#StatObject)                     |                                               | [`RemoveAllBucketNotification`](#RemoveAllBucketNotification) | [`SetS3TransferAccelerate`](#SetS3TransferAccelerate) |
+| [`ListObjects`](#ListObjects)                         | [`RemoveObject`](#RemoveObject)                   |                                               | [`ListenBucketNotification`](#ListenBucketNotification)       |                                                       |
+|                                                       | [`RemoveObjects`](#RemoveObjects) |                                               | [`SetBucketLifecycle`](#SetBucketLifecycle)                   |                                                       |
+| [`ListIncompleteUploads`](#ListIncompleteUploads)     | [`RemoveIncompleteUpload`](#RemoveIncompleteUpload)                         |                                               | [`GetBucketLifecycle`](#GetBucketLifecycle)                   |                                                       |
+| [`SetBucketTagging`](#SetBucketTagging)               | [`FPutObject`](#FPutObject)                         |                                               | [`SetObjectLockConfig`](#SetObjectLockConfig)                 |                                                       |
+| [`GetBucketTagging`](#GetBucketTagging)               | [`FGetObject`](#FGetObject)                   |                                               | [`GetObjectLockConfig`](#GetObjectLockConfig)                 |                                                       |
+| [`RemoveBucketTagging`](#RemoveBucketTagging)         | [`ComposeObject`](#ComposeObject)                                                    |                                               | [`EnableVersioning`](#EnableVersioning)                       |                                                       |
 | [`SetBucketReplication`](#SetBucketReplication)       |                                                     |                                               | [`DisableVersioning`](#DisableVersioning)                     |                                                       |
 | [`GetBucketReplication`](#GetBucketReplication)       | [`PutObjectRetention`](#PutObjectRetention)         |                                               | [`GetBucketEncryption`](#GetBucketEncryption)                 |                                                       |
 | [`RemoveBucketReplication`](#RemoveBucketReplication) | [`GetObjectRetention`](#GetObjectRetention)         |                                               | [`RemoveBucketEncryption`](#RemoveBucketEncryption)           |                                                       |
-|                                                       | [`PutObjectLegalHold`](#PutObjectLegalHold)         |                                               |                                                               |                                                       |
+| [`CancelBucketReplicationResync`](#CancelBucketReplicationResync) | [`PutObjectLegalHold`](#PutObjectLegalHold)         |                                               |                                                               |                                                       |
 |                                                       | [`GetObjectLegalHold`](#GetObjectLegalHold)         |                                               |                                                               |                                                       |
 |                                                       | [`SelectObjectContent`](#SelectObjectContent)       |                                               |                                                               |                                                       |
 |                                                       | [`PutObjectTagging`](#PutObjectTagging)             |                                               |                                                               |                                                       |
 |                                                       | [`GetObjectTagging`](#GetObjectTagging)             |                                               |                                                               |                                                       |
 |                                                       | [`RemoveObjectTagging`](#RemoveObjectTagging)       |                                               |                                                               |                                                       |
 |                                                       | [`RestoreObject`](#RestoreObject)                   |                                               |                                                               |                                                       |
+|                                                       | [`GetObjectAttributes`](#GetObjectAttributes)                   |                                               |                                                               |                                                       |
 
 ## 1. Constructor
 <a name="MinIO"></a>
@@ -423,6 +424,49 @@ if err != nil {
 
 ## 3. Object operations
 
+<a name="AppendObject"></a>
+### AppendObject(ctx context.Context, bucketName, objectName string, reader io.Reader, objectSize int64, opts AppendObjectOptions) (UploadInfo, error)
+
+__Parameters__
+|Param | Type | Description |
+|:--- | :--- | :--- |
+|`ctx` | _context.Context_ | Custom Context for timeout/cancellation of the call|
+|`bucketName`| _string_ | Name of bucket |
+|`objectName`| _string_ | Name of Object |
+|`reader` | _io.Reader_ | standard Reader Interface |
+|`objectSize` | _int64_ | Size of the object |
+|`opts` | _minio.AppendObjectOptions_ | Additional Options for Append Operation|
+
+__Return Value__
+|Param | Type | Description |
+|:--- | :--- | :--- |
+|`info`| _minio.UploadInfo_ | Information about the newly uploaded or copied object |
+|`err`| _error_ | Standard error |
+
+__minio.AppendObjectOptions__
+| Field | Type | Description |
+|:--- | :--- | :--- |
+|`opts.Progress`| _io.Reader_ | A progress reader to indicate progress|
+|`opts.ChuckSize`| _uint64_ | Maximum Append Size |
+|`opts.DisableContentSha256`| _bool_ | Aggressively disable sha256 payload. |
+
+__minio.UploadInfo__
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `info.Bucket` | _string_ | Name of bucket |
+| `info.Key` | _string_ | Name of object |
+| `info.ETag` | _string_ | MD5 checksum of the object |
+| `info.Size` | _string_ |   Size of object | 
+
+__Example__
+```go
+opt := minio.AppendObjectOptions{}
+info, err := minio.AppendObject(context.Background(), "my-bucket-name", "my-object-name", my_progress_reader, size, opt)
+if err != nil {
+  log.Fatalln(err)
+}
+```
+ 
 <a name="GetObject"></a>
 ### GetObject(ctx context.Context, bucketName, objectName string, opts GetObjectOptions) (*Object, error)
 Returns a stream of the object data. Most of the common errors occur when reading the stream.
@@ -445,8 +489,8 @@ __minio.GetObjectOptions__
 |:---|:---|:---|
 | `opts.ServerSideEncryption` | _encrypt.ServerSide_ | Interface provided by `encrypt` package to specify server-side-encryption. (For more information see https://godoc.org/github.com/minio/minio-go/v7) |
 | `opts.Internal`                | _minio.AdvancedGetOptions_               | This option is intended for internal use by MinIO server. This option should not be set unless the application is aware of intended use.
-__Return Value__
 
+__Return Value__
 
 |Param   |Type   |Description   |
 |:---|:---| :---|
@@ -666,7 +710,7 @@ dstOpts := minio.CopyDestOptions{
 }
 
 // Copy object call
-uploadInfo, err := minioClient.CopyObject(context.Background(), dst, src)
+uploadInfo, err := minioClient.CopyObject(context.Background(), dstOpts, srcOpts)
 if err != nil {
     fmt.Println(err)
     return
@@ -702,7 +746,7 @@ dstOpts := minio.CopyDestOptions{
 }
 
 // Copy object call
-_, err = minioClient.CopyObject(context.Background(), dst, src)
+_, err = minioClient.CopyObject(context.Background(), dstOpts, srcOpts)
 if err != nil {
     fmt.Println(err)
     return
@@ -1192,6 +1236,59 @@ err = s3Client.RestoreObject(context.Background(), "your-bucket", "your-object",
 if err != nil {
     log.Fatalln(err)
 }
+```
+
+<a name="GetObjectAttributes"></a>
+### GetObjectAttributes(ctx context.Context, bucketName, objectName string, opts ObjectAttributesOptions) (*ObjectAttributes, error)
+Returns a stream of the object data. Most of the common errors occur when reading the stream.
+
+
+__Parameters__
+
+
+|Param   |Type   |Description   |
+|:---|:---| :---|
+|`ctx`  | _context.Context_  | Custom context for timeout/cancellation of the call|
+|`bucketName`  | _string_  |Name of the bucket  |
+|`objectName` | _string_  |Name of the object  |
+|`opts` | _minio.ObjectAttributesOptions_ | Configuration for pagination and selection of object attributes |
+
+
+__minio.ObjectAttributesOptions__
+
+|Field | Type | Description |
+|:---|:---|:---|
+| `opts.ServerSideEncryption` | _encrypt.ServerSide_ | Interface provided by `encrypt` package to specify server-side-encryption. (For more information see https://godoc.org/github.com/minio/minio-go/v7) |
+| `opts.MaxParts`                | _int               | This option defines how many parts should be returned by the API
+| `opts.VersionID`                | _string               | VersionID defines which version of the object will be used
+| `opts.PartNumberMarker`                | _int               | This options defines which part number pagination will start after, the part which number is equal to PartNumberMarker will not be included in the response
+
+__Return Value__
+
+|Param   |Type   |Description   |
+|:---|:---| :---|
+|`objectAttributes`  | _*minio.ObjectAttributes_ |_minio.ObjectAttributes_ contains the information about the object and it's parts. |
+
+__Example__
+
+
+```go
+objectAttributes, err := c.GetObjectAttributes(
+    context.Background(), 
+    "your-bucket", 
+    "your-object", 
+    minio.ObjectAttributesOptions{
+        VersionID:"object-version-id",
+        NextPartMarker:0,
+        MaxParts:100,
+    })
+
+if err != nil {
+    fmt.Println(err)
+	return
+}
+
+fmt.Println(objectAttributes)
 ```
 
 
@@ -2084,6 +2181,33 @@ err = minioClient.RemoveBucketReplication(context.Background(), "my-bucketname")
 if err != nil {
     fmt.Println(err)
     return
+}
+```
+
+<a name="CancelBucketReplicationResync"></a>
+### CancelBucketReplicationResync(ctx context.Context, bucketName string, tgtArn string) (id string, err error)
+Cancels in progress replication resync (MinIO AiStor Only API)
+
+__Parameters__
+
+|Param  |Type |Description |
+|:---|:---|:---|
+|`ctx` | _context.Context_ | Custom context of timeout/cancellation of the call|
+|`bucketName` | _string_ | Name of the bucket |
+|`tgtArn` | _string_ | Target Amazon Resource Name |
+
+__Return Values__
+|Param |Type |Description |
+|:---|:--|:---|
+|`id`|_string_| Recieved upon successful cancellation of replication resync|
+|`err`| _error_| Standard Error|
+
+__Example__
+```go
+id, err := minioClient.CancelBucketReplicationResync(context.Background(), "my-bucket-name", "my-target-arn")
+if err != nil {
+  fmt.Println(err)
+  return
 }
 ```
 

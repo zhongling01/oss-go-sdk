@@ -1,6 +1,6 @@
 /*
  * MinIO Go Library for Amazon S3 Compatible Cloud Storage
- * Copyright 2015-2017 MinIO, Inc.
+ * Copyright 2015-2024 MinIO, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,14 +29,18 @@ import (
 func TestValidBucketLocation(t *testing.T) {
 	s3Hosts := []struct {
 		bucketLocation string
+		useDualstack   bool
 		endpoint       string
 	}{
-		{"us-east-1", "s3.dualstack.us-east-1.amazonaws.com"},
-		{"unknown", "s3.dualstack.us-east-1.amazonaws.com"},
-		{"ap-southeast-1", "s3.dualstack.ap-southeast-1.amazonaws.com"},
+		{"us-east-1", true, "s3.dualstack.us-east-1.amazonaws.com"},
+		{"us-east-1", false, "s3.us-east-1.amazonaws.com"},
+		{"unknown", true, "s3.dualstack.us-east-1.amazonaws.com"},
+		{"unknown", false, "s3.us-east-1.amazonaws.com"},
+		{"ap-southeast-1", true, "s3.dualstack.ap-southeast-1.amazonaws.com"},
+		{"ap-southeast-1", false, "s3.ap-southeast-1.amazonaws.com"},
 	}
 	for _, s3Host := range s3Hosts {
-		endpoint := getS3Endpoint(s3Host.bucketLocation)
+		endpoint := getS3Endpoint(s3Host.bucketLocation, s3Host.useDualstack)
 		if endpoint != s3Host.endpoint {
 			t.Fatal("Error: invalid bucket location", endpoint)
 		}
@@ -47,17 +51,17 @@ func TestValidBucketLocation(t *testing.T) {
 func TestErrorResponse(t *testing.T) {
 	var err error
 	err = ErrorResponse{
-		Code: "Testing",
+		Code: Testing,
 	}
 	errResp := ToErrorResponse(err)
-	if errResp.Code != "Testing" {
+	if errResp.Code != Testing {
 		t.Fatal("Type conversion failed, we have an empty struct.")
 	}
 
 	// Should fail with invalid argument.
 	err = httpRespToErrorResponse(nil, "", "")
 	errResp = ToErrorResponse(err)
-	if errResp.Code != "InvalidArgument" {
+	if errResp.Code != InvalidArgument {
 		t.Fatal("Empty response input should return invalid argument.")
 	}
 }

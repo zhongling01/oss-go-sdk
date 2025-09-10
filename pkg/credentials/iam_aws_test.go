@@ -75,14 +75,14 @@ const credsRespStsImpl = `<AssumeRoleWithWebIdentityResponse xmlns="https://sts.
 </AssumeRoleWithWebIdentityResponse>`
 
 func initTestFailServer() *httptest.Server {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		http.Error(w, "Not allowed", http.StatusBadRequest)
 	}))
 	return server
 }
 
 func initTestServerNoRoles() *httptest.Server {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.Write([]byte(""))
 	}))
 	return server
@@ -111,15 +111,16 @@ func initIMDSv2Server(expireOn string, failAssume bool) *httptest.Server {
 			return
 		}
 
-		if r.URL.Path == "/latest/meta-data/iam/security-credentials/" {
+		switch r.URL.Path {
+		case "/latest/meta-data/iam/security-credentials/":
 			fmt.Fprintln(w, "RoleName")
-		} else if r.URL.Path == "/latest/meta-data/iam/security-credentials/RoleName" {
+		case "/latest/meta-data/iam/security-credentials/RoleName":
 			if failAssume {
 				fmt.Fprint(w, credsFailRespTmpl)
 			} else {
 				fmt.Fprintf(w, credsRespTmpl, expireOn)
 			}
-		} else {
+		default:
 			http.Error(w, "bad request", http.StatusBadRequest)
 		}
 	}))
@@ -127,7 +128,7 @@ func initIMDSv2Server(expireOn string, failAssume bool) *httptest.Server {
 }
 
 func initEcsTaskTestServer(expireOn string) *httptest.Server {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		fmt.Fprintf(w, credsRespEcsTaskTmpl, expireOn)
 	}))
 
@@ -156,7 +157,7 @@ func initStsTestServer(expireOn string) *httptest.Server {
 
 func TestIAMMalformedEndpoint(t *testing.T) {
 	creds := NewIAM("%%%%")
-	_, err := creds.Get()
+	_, err := creds.GetWithContext(defaultCredContext)
 	if err == nil {
 		t.Fatal("Unexpected should fail here")
 	}
@@ -168,7 +169,7 @@ func TestIAMFailServer(t *testing.T) {
 
 	creds := NewIAM(server.URL)
 
-	_, err := creds.Get()
+	_, err := creds.GetWithContext(defaultCredContext)
 	if err == nil {
 		t.Fatal("Unexpected should fail here")
 	}
@@ -182,7 +183,7 @@ func TestIAMNoRoles(t *testing.T) {
 	defer server.Close()
 
 	creds := NewIAM(server.URL)
-	_, err := creds.Get()
+	_, err := creds.GetWithContext(defaultCredContext)
 	if err == nil {
 		t.Fatal("Unexpected should fail here")
 	}
@@ -196,24 +197,23 @@ func TestIAM(t *testing.T) {
 	defer server.Close()
 
 	p := &IAM{
-		Client:   http.DefaultClient,
 		Endpoint: server.URL,
 	}
 
-	creds, err := p.Retrieve()
+	creds, err := p.RetrieveWithCredContext(defaultCredContext)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if "accessKey" != creds.AccessKeyID {
+	if creds.AccessKeyID != "accessKey" {
 		t.Errorf("Expected \"accessKey\", got %s", creds.AccessKeyID)
 	}
 
-	if "secret" != creds.SecretAccessKey {
+	if creds.SecretAccessKey != "secret" {
 		t.Errorf("Expected \"secret\", got %s", creds.SecretAccessKey)
 	}
 
-	if "token" != creds.SessionToken {
+	if creds.SessionToken != "token" {
 		t.Errorf("Expected \"token\", got %s", creds.SessionToken)
 	}
 
@@ -227,11 +227,10 @@ func TestIAMFailAssume(t *testing.T) {
 	defer server.Close()
 
 	p := &IAM{
-		Client:   http.DefaultClient,
 		Endpoint: server.URL,
 	}
 
-	_, err := p.Retrieve()
+	_, err := p.RetrieveWithCredContext(defaultCredContext)
 	if err == nil {
 		t.Fatal("Unexpected success, should fail")
 	}
@@ -245,7 +244,6 @@ func TestIAMIsExpired(t *testing.T) {
 	defer server.Close()
 
 	p := &IAM{
-		Client:   http.DefaultClient,
 		Endpoint: server.URL,
 	}
 	p.CurrentTime = func() time.Time {
@@ -256,7 +254,7 @@ func TestIAMIsExpired(t *testing.T) {
 		t.Error("Expected creds to be expired before retrieve.")
 	}
 
-	_, err := p.Retrieve()
+	_, err := p.RetrieveWithCredContext(defaultCredContext)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -278,24 +276,23 @@ func TestEcsTask(t *testing.T) {
 	server := initEcsTaskTestServer("2014-12-16T01:51:37Z")
 	defer server.Close()
 	p := &IAM{
-		Client:   http.DefaultClient,
 		Endpoint: server.URL,
 	}
-	os.Setenv("AWS_CONTAINER_CREDENTIALS_RELATIVE_URI", "/v2/credentials?id=task_credential_id")
-	creds, err := p.Retrieve()
+	t.Setenv("AWS_CONTAINER_CREDENTIALS_RELATIVE_URI", "/v2/credentials?id=task_credential_id")
+	creds, err := p.RetrieveWithCredContext(defaultCredContext)
 	os.Unsetenv("AWS_CONTAINER_CREDENTIALS_RELATIVE_URI")
 	if err != nil {
 		t.Errorf("Unexpected failure %s", err)
 	}
-	if "accessKey" != creds.AccessKeyID {
+	if creds.AccessKeyID != "accessKey" {
 		t.Errorf("Expected \"accessKey\", got %s", creds.AccessKeyID)
 	}
 
-	if "secret" != creds.SecretAccessKey {
+	if creds.SecretAccessKey != "secret" {
 		t.Errorf("Expected \"secret\", got %s", creds.SecretAccessKey)
 	}
 
-	if "token" != creds.SessionToken {
+	if creds.SessionToken != "token" {
 		t.Errorf("Expected \"token\", got %s", creds.SessionToken)
 	}
 
@@ -307,25 +304,23 @@ func TestEcsTask(t *testing.T) {
 func TestEcsTaskFullURI(t *testing.T) {
 	server := initEcsTaskTestServer("2014-12-16T01:51:37Z")
 	defer server.Close()
-	p := &IAM{
-		Client: http.DefaultClient,
-	}
-	os.Setenv("AWS_CONTAINER_CREDENTIALS_FULL_URI",
+	p := &IAM{}
+	t.Setenv("AWS_CONTAINER_CREDENTIALS_FULL_URI",
 		fmt.Sprintf("%s%s", server.URL, "/v2/credentials?id=task_credential_id"))
-	creds, err := p.Retrieve()
+	creds, err := p.RetrieveWithCredContext(defaultCredContext)
 	os.Unsetenv("AWS_CONTAINER_CREDENTIALS_FULL_URI")
 	if err != nil {
 		t.Errorf("Unexpected failure %s", err)
 	}
-	if "accessKey" != creds.AccessKeyID {
+	if creds.AccessKeyID != "accessKey" {
 		t.Errorf("Expected \"accessKey\", got %s", creds.AccessKeyID)
 	}
 
-	if "secret" != creds.SecretAccessKey {
+	if creds.SecretAccessKey != "secret" {
 		t.Errorf("Expected \"secret\", got %s", creds.SecretAccessKey)
 	}
 
-	if "token" != creds.SessionToken {
+	if creds.SessionToken != "token" {
 		t.Errorf("Expected \"token\", got %s", creds.SessionToken)
 	}
 
@@ -338,11 +333,10 @@ func TestSts(t *testing.T) {
 	server := initStsTestServer("2014-12-16T01:51:37Z")
 	defer server.Close()
 	p := &IAM{
-		Client:   http.DefaultClient,
 		Endpoint: server.URL,
 	}
 
-	f, err := os.CreateTemp("", "minio-go")
+	f, err := os.CreateTemp(t.TempDir(), "minio-go")
 	if err != nil {
 		t.Errorf("Unexpected failure %s", err)
 	}
@@ -350,23 +344,23 @@ func TestSts(t *testing.T) {
 	f.Write([]byte("token"))
 	f.Close()
 
-	os.Setenv("AWS_WEB_IDENTITY_TOKEN_FILE", f.Name())
-	os.Setenv("AWS_ROLE_ARN", "arn:aws:sts::123456789012:assumed-role/FederatedWebIdentityRole/app1")
-	creds, err := p.Retrieve()
+	t.Setenv("AWS_WEB_IDENTITY_TOKEN_FILE", f.Name())
+	t.Setenv("AWS_ROLE_ARN", "arn:aws:sts::123456789012:assumed-role/FederatedWebIdentityRole/app1")
+	creds, err := p.RetrieveWithCredContext(defaultCredContext)
 	os.Unsetenv("AWS_WEB_IDENTITY_TOKEN_FILE")
 	os.Unsetenv("AWS_ROLE_ARN")
 	if err != nil {
 		t.Errorf("Unexpected failure %s", err)
 	}
-	if "accessKey" != creds.AccessKeyID {
+	if creds.AccessKeyID != "accessKey" {
 		t.Errorf("Expected \"accessKey\", got %s", creds.AccessKeyID)
 	}
 
-	if "secret" != creds.SecretAccessKey {
+	if creds.SecretAccessKey != "secret" {
 		t.Errorf("Expected \"secret\", got %s", creds.SecretAccessKey)
 	}
 
-	if "token" != creds.SessionToken {
+	if creds.SessionToken != "token" {
 		t.Errorf("Expected \"token\", got %s", creds.SessionToken)
 	}
 
@@ -379,11 +373,10 @@ func TestStsCn(t *testing.T) {
 	server := initStsTestServer("2014-12-16T01:51:37Z")
 	defer server.Close()
 	p := &IAM{
-		Client:   http.DefaultClient,
 		Endpoint: server.URL,
 	}
 
-	f, err := os.CreateTemp("", "minio-go")
+	f, err := os.CreateTemp(t.TempDir(), "minio-go")
 	if err != nil {
 		t.Errorf("Unexpected failure %s", err)
 	}
@@ -391,24 +384,24 @@ func TestStsCn(t *testing.T) {
 	f.Write([]byte("token"))
 	f.Close()
 
-	os.Setenv("AWS_REGION", "cn-northwest-1")
-	os.Setenv("AWS_WEB_IDENTITY_TOKEN_FILE", f.Name())
-	os.Setenv("AWS_ROLE_ARN", "arn:aws:sts::123456789012:assumed-role/FederatedWebIdentityRole/app1")
-	creds, err := p.Retrieve()
+	t.Setenv("AWS_REGION", "cn-northwest-1")
+	t.Setenv("AWS_WEB_IDENTITY_TOKEN_FILE", f.Name())
+	t.Setenv("AWS_ROLE_ARN", "arn:aws:sts::123456789012:assumed-role/FederatedWebIdentityRole/app1")
+	creds, err := p.RetrieveWithCredContext(defaultCredContext)
 	os.Unsetenv("AWS_WEB_IDENTITY_TOKEN_FILE")
 	os.Unsetenv("AWS_ROLE_ARN")
 	if err != nil {
 		t.Errorf("Unexpected failure %s", err)
 	}
-	if "accessKey" != creds.AccessKeyID {
+	if creds.AccessKeyID != "accessKey" {
 		t.Errorf("Expected \"accessKey\", got %s", creds.AccessKeyID)
 	}
 
-	if "secret" != creds.SecretAccessKey {
+	if creds.SecretAccessKey != "secret" {
 		t.Errorf("Expected \"secret\", got %s", creds.SecretAccessKey)
 	}
 
-	if "token" != creds.SessionToken {
+	if creds.SessionToken != "token" {
 		t.Errorf("Expected \"token\", got %s", creds.SessionToken)
 	}
 
@@ -420,10 +413,9 @@ func TestStsCn(t *testing.T) {
 func TestIMDSv1Blocked(t *testing.T) {
 	server := initIMDSv2Server("2014-12-16T01:51:37Z", false)
 	p := &IAM{
-		Client:   http.DefaultClient,
 		Endpoint: server.URL,
 	}
-	_, err := p.Retrieve()
+	_, err := p.RetrieveWithCredContext(defaultCredContext)
 	if err != nil {
 		t.Errorf("Unexpected IMDSv2 failure %s", err)
 	}
