@@ -15,7 +15,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
+	"github.com/zhongling01/oss-go-sdk/pkg/s3utils"
 	"hash"
 	"hash/crc32"
 	"io"

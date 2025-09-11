@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	uuid2 "github.com/google/uuid"
-	"github.com/trinet2005/oss-go-sdk/pkg/credentials"
+	"github.com/zhongling01/oss-go-sdk/pkg/credentials"
 	"io"
 	"strings"
 	"testing"

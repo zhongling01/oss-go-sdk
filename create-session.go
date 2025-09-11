@@ -29,7 +29,7 @@ import (
 
 	"github.com/minio/minio-go/v7/pkg/s3utils"
 	"github.com/minio/minio-go/v7/pkg/signer"
-	"github.com/trinet2005/oss-go-sdk/pkg/credentials"
+	"github.com/zhongling01/oss-go-sdk/pkg/credentials"
 )
 
 // SessionMode - session mode type there are only two types

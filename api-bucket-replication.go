@@ -21,15 +21,15 @@ import (
 	"bytes"
 	"context"
 	"encoding/xml"
-	"github.com/trinet2005/oss-go-sdk/internal/json"
+	"github.com/zhongling01/oss-go-sdk/internal/json"
 	"io"
 	"net/http"
 	"net/url"
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/trinet2005/oss-go-sdk/pkg/replication"
-	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
+	"github.com/zhongling01/oss-go-sdk/pkg/replication"
+	"github.com/zhongling01/oss-go-sdk/pkg/s3utils"
 )
 
 // RemoveBucketReplication removes a replication config on an existing bucket.

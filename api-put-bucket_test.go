@@ -2,7 +2,7 @@ package ossClient
 
 import (
 	"context"
-	"github.com/trinet2005/oss-go-sdk/pkg/credentials"
+	"github.com/zhongling01/oss-go-sdk/pkg/credentials"
 	"testing"
 )
 

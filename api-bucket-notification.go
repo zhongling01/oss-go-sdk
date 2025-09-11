@@ -27,8 +27,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/trinet2005/oss-go-sdk/pkg/notification"
-	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
+	"github.com/zhongling01/oss-go-sdk/pkg/notification"
+	"github.com/zhongling01/oss-go-sdk/pkg/s3utils"
 )
 
 // SetBucketNotification saves a new bucket notification with a context to control cancellations and timeouts.

@@ -3,7 +3,7 @@ package ossClient
 import (
 	"context"
 	"fmt"
-	"github.com/trinet2005/oss-go-sdk/pkg/credentials"
+	"github.com/zhongling01/oss-go-sdk/pkg/credentials"
 	"strings"
 	"testing"
 	"time"

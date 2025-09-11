@@ -30,7 +30,7 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
-	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
+	"github.com/zhongling01/oss-go-sdk/pkg/s3utils"
 )
 
 // putObjectMultipartStream - upload a large object using

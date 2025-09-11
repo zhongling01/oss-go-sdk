@@ -20,7 +20,7 @@ package ossClient
 import (
 	"context"
 	"fmt"
-	"github.com/trinet2005/oss-go-sdk/pkg/tags"
+	"github.com/zhongling01/oss-go-sdk/pkg/tags"
 	"io"
 	"net/http"
 	"net/url"
@@ -29,8 +29,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/trinet2005/oss-go-sdk/pkg/encrypt"
-	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
+	"github.com/zhongling01/oss-go-sdk/pkg/encrypt"
+	"github.com/zhongling01/oss-go-sdk/pkg/s3utils"
 )
 
 // CopyDestOptions represents options specified by user for CopyObject/ComposeObject APIs

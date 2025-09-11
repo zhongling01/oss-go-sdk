@@ -20,7 +20,7 @@ package policy
 import (
 	"encoding/json"
 
-	"github.com/trinet2005/oss-go-sdk/pkg/set"
+	"github.com/zhongling01/oss-go-sdk/pkg/set"
 )
 
 // ConditionKeyMap - map of policy condition key and value.

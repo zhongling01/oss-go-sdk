@@ -24,7 +24,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/trinet2005/oss-go-sdk/pkg/encrypt"
+	"github.com/zhongling01/oss-go-sdk/pkg/encrypt"
 )
 
 // AdvancedGetOptions for internal use by MinIO server - not intended for client use.

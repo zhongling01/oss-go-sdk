@@ -23,7 +23,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"github.com/trinet2005/oss-go-sdk/pkg/tags"
+	"github.com/zhongling01/oss-go-sdk/pkg/tags"
 	"io"
 	"net/http"
 	"sort"
@@ -31,8 +31,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/trinet2005/oss-go-sdk/pkg/encrypt"
-	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
+	"github.com/zhongling01/oss-go-sdk/pkg/encrypt"
+	"github.com/zhongling01/oss-go-sdk/pkg/s3utils"
 	"golang.org/x/net/http/httpguts"
 )
 

@@ -27,7 +27,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/trinet2005/oss-go-sdk/pkg/tags"
+	"github.com/zhongling01/oss-go-sdk/pkg/tags"
 	"hash"
 	"io"
 	"math/rand"
@@ -42,7 +42,7 @@ import (
 	"time"
 
 	md5simd "github.com/minio/md5-simd"
-	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
+	"github.com/zhongling01/oss-go-sdk/pkg/s3utils"
 )
 
 func trimEtag(etag string) string {

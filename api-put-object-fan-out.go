@@ -28,7 +28,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/trinet2005/oss-go-sdk/pkg/encrypt"
+	"github.com/zhongling01/oss-go-sdk/pkg/encrypt"
 )
 
 // PutObjectFanOutEntry is per object entry fan-out metadata

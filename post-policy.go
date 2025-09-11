@@ -21,12 +21,12 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"github.com/trinet2005/oss-go-sdk/pkg/tags"
+	"github.com/zhongling01/oss-go-sdk/pkg/tags"
 	"net/http"
 	"strings"
 	"time"
 
-	"github.com/trinet2005/oss-go-sdk/pkg/encrypt"
+	"github.com/zhongling01/oss-go-sdk/pkg/encrypt"
 )
 
 // expirationDateFormat date format for expiration key in json policy.

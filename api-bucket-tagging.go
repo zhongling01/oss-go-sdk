@@ -25,8 +25,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
-	"github.com/trinet2005/oss-go-sdk/pkg/tags"
+	"github.com/zhongling01/oss-go-sdk/pkg/s3utils"
+	"github.com/zhongling01/oss-go-sdk/pkg/tags"
 )
 
 // GetBucketTagging fetch tagging configuration for a bucket with a

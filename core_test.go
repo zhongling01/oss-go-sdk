@@ -28,8 +28,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/trinet2005/oss-go-sdk/pkg/credentials"
-	"github.com/trinet2005/oss-go-sdk/pkg/encrypt"
+	"github.com/zhongling01/oss-go-sdk/pkg/credentials"
+	"github.com/zhongling01/oss-go-sdk/pkg/encrypt"
 )
 
 const (

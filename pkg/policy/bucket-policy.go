@@ -20,11 +20,10 @@ package policy
 import (
 	stdjson "encoding/json"
 	"errors"
-	"github.com/goccy/go-json"
 	"reflect"
 	"strings"
 
-	"github.com/trinet2005/oss-go-sdk/pkg/set"
+	"github.com/zhongling01/oss-go-sdk/pkg/set"
 )
 
 // BucketPolicy - Bucket level policy.

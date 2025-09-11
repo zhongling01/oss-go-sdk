@@ -21,8 +21,8 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/trinet2005/oss-go-sdk/pkg/credentials"
-	"github.com/trinet2005/oss-go-sdk/pkg/policy"
+	"github.com/zhongling01/oss-go-sdk/pkg/credentials"
+	"github.com/zhongling01/oss-go-sdk/pkg/policy"
 )
 
 // Tests valid hosts for location.

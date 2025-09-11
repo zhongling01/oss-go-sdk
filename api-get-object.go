@@ -25,7 +25,7 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
+	"github.com/zhongling01/oss-go-sdk/pkg/s3utils"
 )
 
 // GetObject wrapper function that accepts a request context

@@ -3,8 +3,8 @@ package ossClient
 import (
 	"context"
 	madmin "github.com/trinet2005/oss-admin-go"
-	"github.com/trinet2005/oss-go-sdk/pkg/credentials"
-	"github.com/trinet2005/oss-go-sdk/pkg/tags"
+	"github.com/zhongling01/oss-go-sdk/pkg/credentials"
+	"github.com/zhongling01/oss-go-sdk/pkg/tags"
 	"io"
 	"math/rand"
 	"strconv"

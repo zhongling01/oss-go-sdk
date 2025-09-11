@@ -23,8 +23,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
-	"github.com/trinet2005/oss-go-sdk/pkg/sse"
+	"github.com/zhongling01/oss-go-sdk/pkg/s3utils"
+	"github.com/zhongling01/oss-go-sdk/pkg/sse"
 )
 
 // SetBucketEncryption sets the default encryption configuration on an existing bucket.

@@ -26,7 +26,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
+	"github.com/zhongling01/oss-go-sdk/pkg/s3utils"
 )
 
 // RetentionMode - object retention mode.

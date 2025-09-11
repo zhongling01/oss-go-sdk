@@ -23,6 +23,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"github.com/dustin/go-humanize"
 	"io"
 	"math/rand"
 	"net"
@@ -38,13 +39,12 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/dustin/go-humanize"
 	md5simd "github.com/minio/md5-simd"
-	"github.com/trinet2005/oss-go-sdk/pkg/credentials"
-	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
-	"github.com/trinet2005/oss-go-sdk/pkg/signer"
 	"github.com/minio/minio-go/v7/pkg/kvcache"
 	"github.com/minio/minio-go/v7/pkg/singleflight"
+	"github.com/zhongling01/oss-go-sdk/pkg/credentials"
+	"github.com/zhongling01/oss-go-sdk/pkg/s3utils"
+	"github.com/zhongling01/oss-go-sdk/pkg/signer"
 	"golang.org/x/net/publicsuffix"
 )
 

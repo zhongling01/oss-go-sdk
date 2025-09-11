@@ -99,7 +99,7 @@ import (
 	"context"
 	"fmt"
 	ossClient "github.com/trinet2005/oss-go-sdk"
-	"github.com/trinet2005/oss-go-sdk/pkg/credentials"
+	"github.com/zhongling01/oss-go-sdk/pkg/credentials"
 	"io"
 	"os"
 	"storConsole/app/oss/ossBase"

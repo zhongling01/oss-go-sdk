@@ -6,8 +6,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/trinet2005/oss-go-sdk/pkg/tags"
 	uuid2 "github.com/google/uuid"
+	"github.com/zhongling01/oss-go-sdk/pkg/tags"
 	"io"
 	"time"
 )

@@ -22,7 +22,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/trinet2005/oss-go-sdk/pkg/encrypt"
+	"github.com/zhongling01/oss-go-sdk/pkg/encrypt"
 )
 
 // Core - Inherits Client and adds new methods to expose the low level S3 APIs.

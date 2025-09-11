@@ -30,7 +30,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/trinet2005/oss-go-sdk/pkg/signer"
+	"github.com/zhongling01/oss-go-sdk/pkg/signer"
 )
 
 // AssumeRoleResponse contains the result of successful AssumeRole request.

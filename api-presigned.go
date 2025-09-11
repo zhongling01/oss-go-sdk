@@ -24,8 +24,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
-	"github.com/trinet2005/oss-go-sdk/pkg/signer"
+	"github.com/zhongling01/oss-go-sdk/pkg/s3utils"
+	"github.com/zhongling01/oss-go-sdk/pkg/signer"
 )
 
 // presignURL - Returns a presigned URL for an input 'method'.

@@ -31,8 +31,8 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/trinet2005/oss-go-sdk/pkg/encrypt"
-	"github.com/trinet2005/oss-go-sdk/pkg/s3utils"
+	"github.com/zhongling01/oss-go-sdk/pkg/encrypt"
+	"github.com/zhongling01/oss-go-sdk/pkg/s3utils"
 )
 
 // CSVFileHeaderInfo - is the parameter for whether to utilize headers.
