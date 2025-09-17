@@ -26,7 +26,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/zhongling01/oss-go-sdk/pkg/credentials"
 )
 
 func Test200MultipartUploadWithSpaces(t *testing.T) {

@@ -20,11 +20,11 @@ package ossClient
 import (
 	"bytes"
 	"context"
+	"github.com/zhongling01/oss-go-sdk/internal/json"
 	"io"
 	"net/http"
 
-	"github.com/minio/minio-go/v7/internal/json"
-	"github.com/minio/minio-go/v7/pkg/s3utils"
+	"github.com/zhongling01/oss-go-sdk/pkg/s3utils"
 )
 
 // PromptObject performs language model inference with the prompt and referenced object as context.
