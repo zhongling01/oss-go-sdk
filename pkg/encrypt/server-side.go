@@ -21,9 +21,9 @@ import (
 	"crypto/md5"
 	"encoding/base64"
 	"errors"
+	"github.com/zhongling01/oss-go-sdk/internal/json"
 	"net/http"
 
-	"github.com/minio/minio-go/v7/internal/json"
 	"golang.org/x/crypto/argon2"
 )
 

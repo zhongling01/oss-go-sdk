@@ -19,6 +19,7 @@ package credentials
 
 import (
 	"errors"
+	"github.com/zhongling01/oss-go-sdk/internal/json"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -26,7 +27,6 @@ import (
 	"time"
 
 	"github.com/go-ini/ini"
-	"github.com/minio/minio-go/v7/internal/json"
 )
 
 // A externalProcessCredentials stores the output of a credential_process

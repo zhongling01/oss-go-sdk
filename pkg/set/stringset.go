@@ -19,9 +19,8 @@ package set
 
 import (
 	"fmt"
+	"github.com/zhongling01/oss-go-sdk/internal/json"
 	"sort"
-
-	"github.com/minio/minio-go/v7/internal/json"
 )
 
 // StringSet - uses map as set of strings.
