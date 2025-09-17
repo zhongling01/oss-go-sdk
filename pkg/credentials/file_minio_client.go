@@ -18,11 +18,10 @@
 package credentials
 
 import (
+	"github.com/zhongling01/oss-go-sdk/internal/json"
 	"os"
 	"path/filepath"
 	"runtime"
-
-	"github.com/minio/minio-go/v7/internal/json"
 )
 
 // A FileMinioClient retrieves credentials from the current user's home

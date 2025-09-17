@@ -22,8 +22,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/minio/minio-go/v7/pkg/cors"
-	"github.com/minio/minio-go/v7/pkg/s3utils"
+	"github.com/zhongling01/oss-go-sdk/pkg/cors"
+	"github.com/zhongling01/oss-go-sdk/pkg/s3utils"
 )
 
 // SetBucketCors sets the cors configuration for the bucket
